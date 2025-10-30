@@ -1,0 +1,345 @@
+/* Arka plan */
+.page-container {
+  background-color: #fefaf5;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+}
+
+/* 🔶 Üst turuncu bar */
+.top-bar {
+  background-color: #ff6600;
+  color: white;
+  padding: 20px 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Arama çubuğu */
+.search-input-header {
+  width: 60%;
+  padding: 12px 20px;
+  border-radius: 50px;
+  border: none;
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 15px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+}
+
+/* Kategori butonları */
+.category-buttons {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.category-btn {
+  background-color: white;
+  border: none;
+  border-radius: 30px;
+  padding: 8px 20px;
+  font-weight: 600;
+  color: #ff6600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  background-color: #ffd6b3;
+}
+
+.category-btn.active {
+  background-color: #ff6600;
+  color: white;
+}
+
+/* 🔹 Ürün Kartları */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 25px;
+  padding: 40px 60px;
+}
+
+.product-card {
+  background-color: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 16px 20px;
+}
+
+.product-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.product-info p {
+  font-size: 0.95rem;
+  color: #777;
+  margin-bottom: 12px;
+  height: 40px;
+  overflow: hidden;
+}
+
+.product-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-weight: bold;
+  color: #ff6600;
+  font-size: 1.1rem;
+}
+
+.add-btn {
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.add-btn:hover {
+  background-color: #e25700;
+}
+
+/* Boş liste mesajı */
+.empty-text {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+.page-container {
+  background-color: #fefaf5;
+  min-height: 100vh;
+  padding: 20px 60px;
+}
+
+/* Kategoriler */
+.category-bar {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.category-btn {
+  background-color: white;
+  border: 1px solid #ff6600;
+  border-radius: 25px;
+  padding: 8px 18px;
+  font-weight: 600;
+  color: #ff6600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  background-color: #ffe0c0;
+}
+
+.category-btn.active {
+  background-color: #ff6600;
+  color: white;
+}
+
+/* Ürün Grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 25px;
+  justify-items: center;
+}
+
+.product-card {
+  background-color: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  width: 230px;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.product-info {
+  padding: 12px 14px;
+}
+
+.product-info h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.product-info p {
+  font-size: 0.9rem;
+  color: #777;
+  margin-bottom: 10px;
+  height: 38px;
+  overflow: hidden;
+}
+
+.product-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  font-weight: bold;
+  color: #ff6600;
+  font-size: 1rem;
+}
+
+.add-btn {
+  background-color: #ff6600;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.add-btn:hover {
+  background-color: #e25700;
+}
+
+.empty-text {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #888;
+}
+
+/* 🔹 Kategori Butonları */
+.category-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.category-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.category-btn:hover {
+  background-color: #ffb347;
+  color: #fff;
+  border-color: #ffb347;
+}
+
+.category-btn.active {
+  background-color: #ff6b00;
+  color: white;
+  font-weight: 600;
+}
+
+.category-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 30px 0;
+}
+
+.category-bar button {
+  background: #f1f1f1;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-weight: 500;
+}
+
+.category-bar button:hover {
+  background: #f9d26c;
+}
+
+.category-bar button.active {
+  background: #ff8c00;
+  color: white;
+}
+
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 30px;
+  padding: 20px 60px;
+}
+
+.card-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.card-buttons button {
+  flex: 1;
+  margin: 2px;
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.card-buttons button:first-child {
+  background-color: #ff7b00;
+  color: white;
+}
+
+.card-buttons button:last-child {
+  background-color: #ff0066;
+  color: white;
+}
+
+.card-buttons button:hover {
+  opacity: 0.8;
+}

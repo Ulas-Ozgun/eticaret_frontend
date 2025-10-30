@@ -1,0 +1,103 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #fffaf5;
+  padding: 15px 50px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.logo {
+  color: #ff7b00;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.logo span {
+  color: #000;
+}
+
+.search-bar {
+  padding: 10px 15px;
+  width: 350px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.navbar-right button {
+  margin-left: 10px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cart {
+  background-color: #444;
+  color: white;
+}
+
+.btn-login {
+  background-color: #ff7b00;
+  color: white;
+}
+
+.btn-register {
+  background-color: #00c853;
+  color: white;
+}
+
+.btn-logout {
+  background-color: #e53935;
+  color: white;
+}
+
+.btn-cart:hover {
+  background-color: #222;
+}
+
+.btn-login:hover {
+  background-color: #e66400;
+}
+
+.btn-register:hover {
+  background-color: #00a845;
+}
+
+.btn-logout:hover {
+  background-color: #c62828;
+}
+.btn-fav {
+  background-color: #ff0066;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  margin-right: 8px;
+  transition: 0.3s;
+}
+
+.btn-fav:hover {
+  opacity: 0.8;
+}
+
+.btn-fav {
+  background-color: #ff007f;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.2s;
+  font-weight: bold;
+}
+
+.btn-fav:hover {
+  background-color: #e60073;
+}
+

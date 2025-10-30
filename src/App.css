@@ -1,0 +1,245 @@
+/* === FONT === */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+/* === GENEL === */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  background-color: #fff5ec;
+  color: #222;
+  overflow-x: hidden;
+}
+
+/* === NAVBAR === */
+.navbar {
+  background: linear-gradient(90deg, #1e1e1e 0%, #2c2c2c 100%);
+  padding: 15px 40px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* === LOGO === */
+.navbar-brand {
+  color: #ff7b00;
+  font-size: 1.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 1px;
+  transition: 0.3s;
+}
+
+.navbar-brand span {
+  color: #fff;
+}
+
+.navbar-brand:hover {
+  text-shadow: 0 0 10px #ff6600;
+}
+
+/* === NAV BUTONLARI === */
+.nav-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.btn-login {
+  background: linear-gradient(90deg, #ff7b00, #ff4500);
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.btn-login:hover {
+  background: linear-gradient(90deg, #ff9100, #ff5c33);
+  box-shadow: 0 0 10px #ff6600;
+}
+
+.btn-register {
+  background: linear-gradient(90deg, #00b09b, #96c93d);
+  color: #fff;
+  font-weight: 600;
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.3s ease;
+}
+
+.btn-register:hover {
+  background: linear-gradient(90deg, #29d39a, #a7e845);
+  box-shadow: 0 0 10px #29d39a;
+}
+
+.btn-cart {
+  background: #444;
+  color: #fff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: 0.3s ease;
+}
+
+.btn-cart:hover {
+  background: #666;
+}
+
+/* === ÜRÜN KARTLARI === */
+.product-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 40px;
+  justify-content: center;
+  align-items: stretch;
+  padding: 60px 80px;
+}
+
+.product-card {
+  background-color: white;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(255, 107, 0, 0.3);
+}
+
+.product-image {
+  width: 100%;
+  height: 230px;
+  object-fit: cover;
+  border-bottom: 3px solid #ff7b00;
+}
+
+.product-info {
+  padding: 15px 20px;
+  text-align: left;
+}
+
+.product-info h3 {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.product-info p {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.product-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.price {
+  color: #ff7b00;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.add-button {
+  background-color: #ff7b00;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.add-button:hover {
+  background-color: #e65b00;
+  transform: scale(1.05);
+}
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+}
+
+.nav-search {
+  width: 400px;
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  color: #333;
+  background-color: #fff;
+  transition: 0.3s;
+}
+
+.nav-search:focus {
+  box-shadow: 0 0 8px rgba(255, 123, 0, 0.6);
+  transform: scale(1.03);
+}
+
+.btn-logout {
+  background-color: #e53935;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-logout:hover {
+  background-color: #c62828;
+}
+
+.welcome-text {
+  margin-right: 15px;
+  color:#ff887f;
+  font-weight: 500;
+}
+.btn-fav {
+  background-color: #ff007f;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.2s;
+  font-weight: bold;
+}
+
+.btn-fav:hover {
+  background-color: #e60073;
+}
+ .product-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+  margin-bottom: 10px;
+  background-color: #f7f7f7;
+}
