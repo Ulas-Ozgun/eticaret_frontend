@@ -5,9 +5,11 @@ import "./Navbar.css";
 function Navbar() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
+  const userName = localStorage.getItem("userName");
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
+    localStorage.removeItem("userName");
     navigate("/login");
   };
 
@@ -26,12 +28,22 @@ function Navbar() {
       <div className="navbar-right">
         {userId && (
           <>
-            <button onClick={() => navigate("/favorites")} className="btn-fav">
-              ❤️ Favorilerim
-            </button>
+            <span className="welcome">
+              Hoş geldin, <b>{userName}</b>
+            </span>
+
             <button onClick={() => navigate("/cart")} className="btn-cart">
               🛒 Sepetim
             </button>
+
+            <button onClick={() => navigate("/orders")} className="btn-orders">
+              📦 Siparişlerim
+            </button>
+
+            <button onClick={() => navigate("/favorites")} className="btn-fav">
+              ❤️ Favorilerim
+            </button>
+
             <button onClick={handleLogout} className="btn-logout">
               🚪 Çıkış Yap
             </button>

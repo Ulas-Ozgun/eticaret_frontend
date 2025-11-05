@@ -343,3 +343,16 @@
 .card-buttons button:hover {
   opacity: 0.8;
 }
+.stock-status {
+  margin-top: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.in-stock {
+  color: #28a745;
+}
+
+.out-stock {
+  color: #d32f2f;
+}

@@ -3,8 +3,9 @@
   justify-content: space-between;
   align-items: center;
   background-color: #fffaf5;
-  padding: 15px 50px;
+  padding: 15px 40px; /* 🔹 biraz daraltıldı */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap; /* 🔹 küçük ekranlarda taşma olmasın */
 }
 
 .logo {
@@ -19,85 +20,48 @@
 
 .search-bar {
   padding: 10px 15px;
-  width: 350px;
+  width: 300px; /* 🔹 biraz daraltıldı */
   border-radius: 25px;
   border: 1px solid #ccc;
   outline: none;
 }
 
+.navbar-right {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px; /* 🔹 margin yerine boşluk verdik */
+}
+
+/* 🔹 Tüm butonlar için temel stil */
 .navbar-right button {
-  margin-left: 10px;
-  padding: 8px 16px;
-  border: none;
+  padding: 6px 10px;
+  font-size: 14px;
   border-radius: 6px;
+  border: none;
+  cursor: pointer;
   font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-cart {
-  background-color: #444;
-  color: white;
-}
-
-.btn-login {
-  background-color: #ff7b00;
-  color: white;
-}
-
-.btn-register {
-  background-color: #00c853;
-  color: white;
-}
-
-.btn-logout {
-  background-color: #e53935;
-  color: white;
-}
-
-.btn-cart:hover {
-  background-color: #222;
-}
-
-.btn-login:hover {
-  background-color: #e66400;
-}
-
-.btn-register:hover {
-  background-color: #00a845;
-}
-
-.btn-logout:hover {
-  background-color: #c62828;
-}
-.btn-fav {
-  background-color: #ff0066;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  padding: 8px 14px;
-  cursor: pointer;
-  margin-right: 8px;
-  transition: 0.3s;
-}
-
-.btn-fav:hover {
-  opacity: 0.8;
-}
-
-.btn-fav {
-  background-color: #ff007f;
-  color: white;
-  border: none;
-  padding: 8px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  text-decoration: none;
   transition: 0.2s;
-  font-weight: bold;
 }
 
-.btn-fav:hover {
-  background-color: #e60073;
-}
+/* 🔹 Butonlar */
+.btn-cart { background-color: #444; color: white; }
+.btn-fav { background-color: #ff007f; color: white; font-weight: bold; }
+.btn-orders { background-color: #ffb347; color: white; font-weight: 600; }
+.btn-login { background-color: #ff7b00; color: white; }
+.btn-register { background-color: #00c853; color: white; }
+.btn-logout { background-color: #e53935; color: white; }
 
+/* 🔹 Hover efektleri */
+.btn-cart:hover { background-color: #222; }
+.btn-fav:hover { background-color: #e60073; }
+.btn-orders:hover { background-color: #ff9900; }
+.btn-login:hover { background-color: #e66400; }
+.btn-register:hover { background-color: #00a845; }
+.btn-logout:hover { background-color: #c62828; }
+
+.welcome {
+  font-weight: 500;
+  color: #ff7b00; /* 🟧 turuncu renk */
+  margin-right: 8px;
+}

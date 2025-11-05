@@ -204,3 +204,8 @@
     transform: scale(1);
   }
 }
+.cart-size {
+  font-weight: 500;
+  color: #ff7b00;
+  margin-bottom: 5px;
+}

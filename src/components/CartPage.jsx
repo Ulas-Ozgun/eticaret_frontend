@@ -73,10 +73,14 @@ function CartPage() {
   };
 
   // 🔹 Satın al butonu
-  // 🔹 Satın al butonu
   const handleCheckout = async () => {
     try {
-      await axios.delete(`https://localhost:7258/api/Cart/clear/${userId}`);
+      const response = await axios.post(
+        `https://localhost:7258/api/Cart/purchase/${userId}`
+      );
+
+      // Başarılıysa popup göster
+      alert(response.data.message || "Satın alma işlemi başarılı 🎉");
       setShowPopup(true);
       setCartItems([]);
       setTotalPrice(0);
@@ -85,7 +89,11 @@ function CartPage() {
         setShowPopup(false);
       }, 3000);
     } catch (error) {
-      console.error("Sepet temizlenemedi:", error);
+      console.error("Satın alma hatası:", error);
+      alert(
+        error.response?.data?.message ||
+          "🚫 Satın alma sırasında bir hata oluştu!"
+      );
     }
   };
 
@@ -121,6 +129,16 @@ function CartPage() {
                 <div className="cart-info">
                   <h3>{item.product.name}</h3>
                   <p>{item.product.description}</p>
+
+                  {/* ⭐ Yeni eklenen kısım: Seçilen beden/numara */}
+                  {item.size && (
+                    <p className="cart-size">
+                      {isNaN(item.size)
+                        ? `👕 Beden: ${item.size}`
+                        : `👟 Numara: ${item.size}`}
+                    </p>
+                  )}
+
                   <span className="cart-price">{item.product.price} ₺</span>
                 </div>
 

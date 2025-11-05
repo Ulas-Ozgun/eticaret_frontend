@@ -1,0 +1,511 @@
+/* === ÜRÜN DETAY SAYFASI === */
+.detail-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 80px;
+  padding: 80px 100px;
+  background-color: #fff5ec;
+  min-height: 85vh;
+}
+
+/* === SOL GÖRSEL === */
+.detail-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.detail-image {
+  width: 450px;
+  height: 450px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+ 
+}
+
+/* === SAĞ BİLGİ === */
+.detail-right {
+  flex: 1;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px 50px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.detail-name {
+  font-size: 2rem;
+  color: #ff7b00;
+  margin-bottom: 10px;
+}
+
+.detail-description {
+  color: #444;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+.detail-price {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 30px;
+}
+
+/* === ADET SEÇİMİ === */
+.detail-quantity {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 35px;
+}
+
+.qty-btn {
+  background-color: #ff7b00;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.qty-btn:hover {
+  background-color: #e65b00;
+}
+
+.qty-value {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* === BUTONLAR === */
+.detail-buttons {
+  display: flex;
+  gap: 20px;
+}
+
+.btn-buy {
+  background-color: #0e6245;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-buy:hover {
+  background-color: #12895e;
+  transform: scale(1.05);
+}
+
+.btn-add-cart {
+  background: linear-gradient(90deg, #ff7b00, #ff4500);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add-cart:hover {
+  background: linear-gradient(90deg, #ff9100, #ff5c33);
+  transform: scale(1.05);
+}
+.detail-meta {
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+
+.detail-meta p {
+  font-size: 1rem;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.in-stock {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.out-stock {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.detail-meta {
+  margin-top: 15px;
+  font-size: 0.95rem;
+}
+
+.detail-meta strong {
+  color: #555;
+}
+
+.detail-meta .in-stock {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.detail-meta .out-stock {
+  color: #d32f2f;
+  font-weight: 600;
+}
+/* 🔹 Tükendi ürün efekti */
+.out-stock {
+  color: #d32f2f;
+  font-weight: 700;
+}
+
+/* 🔹 Stokta var efekti */
+.in-stock {
+  color: #28a745;
+  font-weight: 600;
+}
+
+/* 🔹 Tükendi ürünlerde görsel saydam olsun */
+.detail-left img.out-of-stock {
+  opacity: 0.6;
+  filter: grayscale(40%);
+  transition: all 0.3s ease;
+}
+
+/* 🔹 Sepete ekle butonu tükendiğinde pasif görünüm */
+.btn-add-cart:disabled {
+  background-color: #ccc !important;
+  color: #666 !important;
+  cursor: not-allowed;
+  box-shadow: none;
+  border: none;
+}
+
+/* 🔹 Genel kart düzenini biraz daha zarif hale getirelim */
+.detail-page {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 40px;
+  padding: 50px;
+  background-color: #fffaf7;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+}
+
+.detail-left img {
+  border-radius: 12px;
+  transition: all 0.4s ease;
+}
+
+/* 🔹 Hoverda ürün resmi biraz büyüsün */
+.detail-left img:hover {
+  transform: scale(1.03);
+}
+
+/* 🔹 “Sepete Ekle” butonu hover efekti */
+.btn-add-cart:not(:disabled):hover {
+  background-color: #ff7300;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+/* 🔹 “Favorilere Ekle” butonu hover efekti */
+.btn-add-fav:hover {
+  background-color: #ffb6c1;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+.detail-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 80px;
+  padding: 80px 100px;
+  background-color: #fffaf6;
+  min-height: 100vh;
+}
+
+/* 🔹 Ürün görseli bölümü */
+.detail-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* eski turuncu çerçeveyi kaldırıyoruz */
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  padding: 0;
+}
+
+
+.detail-left img {
+  width: 100%;
+  max-width: 500px;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  background-color: white;
+}
+
+.detail-left img:hover {
+  transform: scale(1.03);
+}
+
+/* 🔹 Ürün bilgileri */
+.detail-right {
+  flex: 1;
+  background-color: transparent;
+  padding: 20px;
+  border-radius: 16px;
+}
+
+.detail-name {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #ff6600;
+  margin-bottom: 10px;
+}
+
+.detail-description {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+/* 🔹 Meta bilgi (kategori / stok durumu) */
+.detail-meta {
+  background: linear-gradient(to right, #ffffff, #fff1e6);
+  border-radius: 12px;
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.detail-meta strong {
+  color: #333;
+}
+
+.in-stock {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.out-stock {
+  color: #c62828;
+  font-weight: 700;
+}
+
+/* 🔹 Fiyat */
+.detail-price {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 25px;
+}
+
+/* 🔹 Miktar kontrol */
+.detail-quantity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.qty-btn {
+  background-color: #ff6600;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.qty-btn:hover {
+  background-color: #ff8533;
+}
+
+.qty-value {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* 🔹 Butonlar */
+.detail-buttons {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.btn-add-cart {
+  background-color: #ff6600;
+  border: none;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 102, 0, 0.3);
+}
+
+.btn-add-cart:hover:not(:disabled) {
+  background-color: #ff7b1a;
+  transform: scale(1.05);
+}
+
+.btn-add-cart:disabled {
+  background-color: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-add-fav {
+  background-color: white;
+  border: 2px solid #ff7b9c;
+  color: #ff2b61;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add-fav:hover {
+  background-color: #ff7b9c;
+  color: white;
+  transform: scale(1.05);
+}
+
+/* 🔹 Responsive düzen */
+@media (max-width: 992px) {
+  .detail-page {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px;
+  }
+
+.detail-left img {
+  width: 100%;
+  max-width: 500px;
+  border: none !important;
+  outline: none !important;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  background: white;
+  transition: all 0.4s ease;
+}
+
+
+  .detail-right {
+    text-align: center;
+  }
+
+  .detail-buttons {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+/* 🔥 Turuncu çerçeveyi tamamen kaldırıyoruz */
+.detail-left {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* 🔹 Görsel bölümü */
+.detail-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  border: none !important;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+/* 🔹 Blur arka plan efekti */
+.detail-left::before {
+  content: "";
+  position: absolute;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 170, 100, 0.25),
+    rgba(255, 255, 255, 0.9)
+  );
+  backdrop-filter: blur(40px);
+  filter: blur(30px);
+  z-index: 1;
+}
+
+/* 🔹 Ürün görseli */
+.detail-left img {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 500px;
+  border: none;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  transform: scale(1);
+}
+
+/* Hover animasyonu */
+.detail-left img:hover {
+  transform: scale(1.04);
+  box-shadow: 0 25px 80px rgba(255, 102, 0, 0.3);
+}
+
+.option-group {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option-group label {
+  font-weight: 600;
+  color: #333;
+}
+
+.option-group select {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1.5px solid #ff6600;
+  background: #fff;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+
+.option-group select:focus {
+  outline: none;
+  border-color: #ff6600;
+  box-shadow: 0 0 8px rgba(255, 102, 0, 0.3);
+}

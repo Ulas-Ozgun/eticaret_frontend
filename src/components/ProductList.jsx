@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ProductList.css";
+import { useNavigate } from "react-router-dom";
 
 const API_URL = "https://localhost:7258/api";
 
@@ -8,6 +9,7 @@ function ProductList({ searchTerm }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
 
@@ -101,7 +103,12 @@ function ProductList({ searchTerm }) {
           <p>Ürün bulunamadı 😢</p>
         ) : (
           filteredProducts.map((product) => (
-            <div key={product.id} className="product-card">
+            <div
+              key={product.id}
+              className="product-card"
+              onClick={() => navigate(`/product/${product.id}`)}
+              style={{ cursor: "pointer" }}
+            >
               <img
                 src={
                   product.imageUrl
@@ -114,11 +121,28 @@ function ProductList({ searchTerm }) {
               <h3>{product.name}</h3>
               <p>{product.description}</p>
               <span>{product.price} ₺</span>
+              <div className="stock-status">
+                {product.stock > 0 ? (
+                  <span className="in-stock">
+                    🟢 Stokta var ({product.stock})
+                  </span>
+                ) : (
+                  <span className="out-stock">🔴 Tükendi</span>
+                )}
+              </div>
 
               <div className="card-buttons">
-                <button onClick={() => addToCart(product.id)}>
+                <button
+                  onClick={() => addToCart(product.id)}
+                  disabled={product.stock <= 0}
+                  style={{
+                    opacity: product.stock <= 0 ? 0.5 : 1,
+                    cursor: product.stock <= 0 ? "not-allowed" : "pointer",
+                  }}
+                >
                   🛒 Sepete Ekle
                 </button>
+
                 <button onClick={() => addToFavorites(product.id)}>
                   ❤️ Favorilere Ekle
                 </button>
