@@ -509,3 +509,246 @@
   border-color: #ff6600;
   box-shadow: 0 0 8px rgba(255, 102, 0, 0.3);
 }
+
+.yorumlar {
+  background-color: #fffaf5;
+  border-radius: 10px;
+  margin-top: 30px;
+  padding: 20px;
+}
+
+.yorum-ekle textarea {
+  width: 100%;
+  height: 80px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  resize: none;
+}
+
+.yorum-ekle select {
+  margin-top: 10px;
+  padding: 6px;
+  border-radius: 6px;
+}
+
+.yorum-ekle button {
+  margin-left: 10px;
+  background-color: #ff7b00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.yorum-ekle button:hover {
+  background-color: #e66a00;
+}
+
+.yorum-item {
+  border-bottom: 1px solid #eee;
+  padding: 10px 0;
+}
+
+/* 🔹 Yorumlar bölümü */
+.reviews-section {
+  margin-top: 40px;
+  padding: 20px;
+  border-top: 2px solid #f0f0f0;
+}
+
+.reviews-section h3 {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+/* 🔹 Yeni yorum ekleme alanı */
+.add-review {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+.add-review textarea {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: none;
+  transition: border 0.2s ease;
+}
+
+.add-review textarea:focus {
+  border-color: #ff7f50;
+  outline: none;
+}
+
+.review-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-controls select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background-color: #fafafa;
+}
+
+.review-controls button {
+  background-color: #ff7f50;
+  color: white;
+  border: none;
+  padding: 7px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.review-controls button:hover {
+  background-color: #ff5c1c;
+}
+
+/* 🔹 Mevcut yorum listesi */
+.review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-item {
+  background-color: #fafafa;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  padding: 12px 16px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.review-item strong {
+  font-size: 15px;
+  color: #222;
+}
+
+.review-item p {
+  margin: 5px 0 8px;
+  color: #555;
+  font-size: 14px;
+}
+
+.review-item small {
+  color: #888;
+  font-size: 12px;
+}
+
+/* 🔹 Yıldız stilleri */
+.review-item .stars {
+  color: #ffcc00;
+  margin-left: 4px;
+}
+.detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  width: 100%;
+  padding: 20px 60px;
+}
+
+/* Üstte ürün bilgisi kısmı */
+.detail-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 50px;
+}
+
+/* Sol (fotoğraf) */
+.detail-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Sağ (ürün detayları) */
+.detail-right {
+  flex: 1;
+}
+
+/* Yorum bölümü tam genişlikte */
+.reviews-section {
+  width: 100%;
+  background-color: #fffaf7;
+  border-top: 2px solid #f5d0a0;
+  border-radius: 12px;
+  padding: 30px;
+  margin-top: 40px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Başlık */
+.reviews-section h3 {
+  font-size: 22px;
+  color: #ff6600;
+  margin-bottom: 15px;
+}
+
+/* Yorum kutusu */
+.add-review textarea {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: none;
+}
+
+.review-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.review-list {
+  margin-top: 25px;
+}
+
+.review-item {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: #e74c3c;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: 0.2s;
+}
+
+.delete-btn:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
