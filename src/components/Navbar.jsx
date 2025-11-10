@@ -6,10 +6,12 @@ function Navbar() {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
+  const role = localStorage.getItem("role"); // 🔹 Rol bilgisini alıyoruz (Admin veya User)
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
+    localStorage.removeItem("role"); // 🔹 Rol bilgisini de temizle
     navigate("/login");
   };
 
@@ -43,6 +45,25 @@ function Navbar() {
             <button onClick={() => navigate("/favorites")} className="btn-fav">
               ❤️ Favorilerim
             </button>
+
+            {/* 🔹 Eğer giriş yapan kişi admin ise admin butonları göster */}
+            {role && role.toLowerCase() === "admin" && (
+              <>
+                <button
+                  onClick={() => navigate("/admin-panel")}
+                  className="btn-admin"
+                >
+                  ⚙️ Admin Paneli
+                </button>
+
+                <button
+                  onClick={() => navigate("/admin-orders")}
+                  className="btn-orders-control"
+                >
+                  📦 Siparişleri Yönet
+                </button>
+              </>
+            )}
 
             <button onClick={handleLogout} className="btn-logout">
               🚪 Çıkış Yap

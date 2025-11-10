@@ -16,11 +16,14 @@ function Login() {
       // 🔹 Backend'den kullanıcı bilgilerini al
       const data = await loginUser(form.email, form.password);
 
-      // 🔹 localStorage'a kullanıcı ID'sini kaydet (backend id döndürüyorsa)
+      // 🔹 Kullanıcı bilgilerini localStorage'a kaydet
       localStorage.setItem("userId", data.id || data.userId);
+      localStorage.setItem("userName", data.name || "Kullanıcı");
+      localStorage.setItem("role", data.role || "User"); // 🔥 ROL bilgisini ekledik
 
       setMessage("✅ Giriş başarılı! Hoş geldin " + (data.name || "Kullanıcı"));
-      localStorage.setItem("userName", data.name || "Kullanıcı");
+
+      // Ana sayfaya yönlendir
       window.location.href = "/";
 
       console.log("Giriş sonucu:", data);
@@ -28,7 +31,6 @@ function Login() {
       setMessage(
         "❌ Giriş başarısız: " + (error.response?.data?.message || "Hata")
       );
-
       console.error("Login hatası:", error);
     }
   };
