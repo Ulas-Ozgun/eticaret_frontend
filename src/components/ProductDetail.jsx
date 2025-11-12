@@ -12,7 +12,8 @@ function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState("");
   const userId = localStorage.getItem("userId");
 
-  // 🔹 Yorum state'leri
+  const [bedenler, setBedenler] = useState([]);
+  const [numaralar, setNumaralar] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [rating, setRating] = useState(0);
@@ -31,18 +32,15 @@ function ProductDetail() {
     fetchProduct();
   }, [id]);
 
-  // 🔹 Ürüne ait yorumları yükle
+  // 🔹 Ürüne ait yorumları getir
   const fetchReviews = async () => {
     try {
       const res = await axios.get(`${API_URL}/Review/${id}`);
-
-      // 🔹 Yorumları tarihe göre sırala (en yeni üstte)
       const sorted = res.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
       setReviews(sorted);
 
-      // ⭐ Ortalama puan hesapla
       if (sorted.length > 0) {
         const total = sorted.reduce((sum, r) => sum + r.rating, 0);
         setAverageRating((total / sorted.length).toFixed(1));
@@ -58,13 +56,31 @@ function ProductDetail() {
     fetchReviews();
   }, [id]);
 
+  // 🔹 Beden / Numara dinamik olarak çek
+  useEffect(() => {
+    const fetchOptions = async () => {
+      try {
+        if (product?.category?.name === "Giyim") {
+          const res = await axios.get(`${API_URL}/Beden/byProduct/${id}`);
+          setBedenler(res.data);
+        }
+        if (product?.category?.name === "Ayakkabı") {
+          const res = await axios.get(`${API_URL}/Numara/byProduct/${id}`);
+          setNumaralar(res.data);
+        }
+      } catch (err) {
+        console.error("Beden/numara verisi alınamadı:", err);
+      }
+    };
+    if (product) fetchOptions();
+  }, [product, id]);
+
   // 🔹 Sepete ekle
   const addToCart = async () => {
     if (!userId) {
       alert("🔐 Lütfen giriş yap!");
       return;
     }
-
     if (
       !selectedSize &&
       (product.category?.name === "Giyim" ||
@@ -79,7 +95,7 @@ function ProductDetail() {
         userId: parseInt(userId),
         productId: product.id,
         quantity,
-        selectedSize: selectedSize,
+        selectedSize,
       });
       alert("🛒 Ürün sepete eklendi!");
     } catch (err) {
@@ -106,14 +122,13 @@ function ProductDetail() {
     }
   };
 
-  // 🔹 Yeni yorum gönder
+  // 🔹 Yorum gönder
   const submitReview = async (e) => {
     e.preventDefault();
     if (!userId) {
       alert("Yorum yapmak için giriş yapmalısın!");
       return;
     }
-
     if (!newComment || rating === 0) {
       alert("Yorum ve puan girmek zorunludur!");
       return;
@@ -136,7 +151,7 @@ function ProductDetail() {
     }
   };
 
-  // 🔹 Yorum silme
+  // 🔹 Yorum sil
   const deleteReview = async (reviewId) => {
     const confirmDelete = window.confirm(
       "Yorumu silmek istediğine emin misin?"
@@ -157,7 +172,6 @@ function ProductDetail() {
 
   return (
     <div className="detail-page">
-      {/* Üst kısım: ürün görseli + detaylar */}
       <div className="detail-top">
         <div className="detail-left">
           <img
@@ -178,7 +192,6 @@ function ProductDetail() {
         <div className="detail-right">
           <h2 className="detail-name">{product.name}</h2>
 
-          {/* ⭐ Ortalama puan ve yorum sayısı */}
           {averageRating > 0 ? (
             <div className="average-rating">
               {"⭐".repeat(Math.round(averageRating))}{" "}
@@ -207,7 +220,7 @@ function ProductDetail() {
             </p>
           </div>
 
-          {/* 🔹 Beden veya numara seçimi */}
+          {/* 🔹 Dinamik beden/numara seçimi */}
           {product.category?.name === "Giyim" && (
             <div className="option-group">
               <label>Beden Seç:</label>
@@ -216,11 +229,11 @@ function ProductDetail() {
                 onChange={(e) => setSelectedSize(e.target.value)}
               >
                 <option value="">Seçiniz</option>
-                <option value="XS">XS</option>
-                <option value="S">S</option>
-                <option value="M">M</option>
-                <option value="L">L</option>
-                <option value="XL">XL</option>
+                {bedenler.map((b) => (
+                  <option key={b.id} value={b.bedenAdi}>
+                    {b.bedenAdi}
+                  </option>
+                ))}
               </select>
             </div>
           )}
@@ -233,9 +246,9 @@ function ProductDetail() {
                 onChange={(e) => setSelectedSize(e.target.value)}
               >
                 <option value="">Seçiniz</option>
-                {Array.from({ length: 10 }, (_, i) => 36 + i).map((num) => (
-                  <option key={num} value={num}>
-                    {num}
+                {numaralar.map((n) => (
+                  <option key={n.id} value={n.numaraDegeri}>
+                    {n.numaraDegeri}
                   </option>
                 ))}
               </select>
@@ -279,7 +292,7 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/* 🔹 ALTTA TAM GENİŞLİKTE YORUM BÖLÜMÜ */}
+      {/* 🔹 ALTTA YORUM BÖLÜMÜ */}
       <div className="reviews-section">
         <h3>📝 Ürün Yorumları</h3>
 

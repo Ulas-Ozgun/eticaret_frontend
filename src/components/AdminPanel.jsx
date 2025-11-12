@@ -19,12 +19,21 @@ function AdminPanel() {
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
+  // 🔹 Yeni eklenen state’ler
+  const [categories, setCategories] = useState([]);
+  const [bedenler, setBedenler] = useState([]);
+  const [numaralar, setNumaralar] = useState([]);
+  const [selectedBedenler, setSelectedBedenler] = useState([]);
+  const [selectedNumaralar, setSelectedNumaralar] = useState([]);
+
   const role = localStorage.getItem("role");
 
   useEffect(() => {
     if (role === "Admin") {
       loadProducts();
       loadOrders();
+      loadOptions();
+      loadCategories();
     }
   }, [role]);
 
@@ -48,41 +57,88 @@ function AdminPanel() {
     }
   };
 
+  // 🧩 Beden / numara listelerini çek
+  const loadOptions = async () => {
+    try {
+      const [bedenRes, numaraRes] = await Promise.all([
+        axios.get(`${API_URL}/Beden`),
+        axios.get(`${API_URL}/Numara`),
+      ]);
+      setBedenler(bedenRes.data);
+      setNumaralar(numaraRes.data);
+    } catch (err) {
+      console.error("Beden/numara verileri alınamadı:", err);
+    }
+  };
+
+  // 🔹 Kategorileri çek
+  const loadCategories = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/Category`);
+      setCategories(res.data);
+    } catch (error) {
+      console.error("Kategoriler alınamadı:", error);
+    }
+  };
+
+  // ✅ Checkbox seçimleri
+  const handleBedenChange = (id) => {
+    setSelectedBedenler((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleNumaraChange = (id) => {
+    setSelectedNumaralar((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
+  // ➕ Ürün ekle veya güncelle
   // ➕ Ürün ekle veya güncelle
   const handleAddOrUpdate = async (e) => {
     e.preventDefault();
 
     try {
-      if (editingId) {
-        // ✏️ Güncelleme (PUT)
-        const payload = {
-          ...newProduct,
-          price: Number(newProduct.price),
-          stock: Number(newProduct.stock),
-          categoryId: Number(newProduct.categoryId),
-        };
+      const formData = new FormData();
+      formData.append("Name", String(newProduct.name ?? ""));
+      formData.append("Description", String(newProduct.description ?? ""));
+      formData.append("Price", String(newProduct.price ?? 0));
+      formData.append("Stock", String(newProduct.stock ?? 0));
+      formData.append("CategoryId", String(newProduct.categoryId ?? 0));
 
-        await axios.put(`${API_URL}/Product/${editingId}`, payload);
-        alert("✏️ Ürün başarıyla güncellendi!");
+      if (imageFile) {
+        formData.append("ImageFile", imageFile);
+      }
+
+      // ✅ Seçilen bedenleri ekle
+      if (selectedBedenler && selectedBedenler.length > 0) {
+        selectedBedenler.forEach((id) =>
+          formData.append("BedenIds", String(id))
+        );
+      }
+
+      // ✅ Seçilen numaraları ekle
+      if (selectedNumaralar && selectedNumaralar.length > 0) {
+        selectedNumaralar.forEach((id) =>
+          formData.append("NumaraIds", String(id))
+        );
+      }
+
+      if (editingId) {
+        await axios.put(`${API_URL}/Product/${editingId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("✏️ Ürün güncellendi");
         setEditingId(null);
       } else {
-        // 📸 Yeni ürün ekleme (FormData ile resim dahil)
-        const formData = new FormData();
-        formData.append("Name", newProduct.name);
-        formData.append("Description", newProduct.description);
-        formData.append("Price", newProduct.price);
-        formData.append("Stock", newProduct.stock);
-        formData.append("CategoryId", newProduct.categoryId);
-        if (imageFile) formData.append("ImageFile", imageFile);
-
         await axios.post(`${API_URL}/Product/add-with-image`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-
-        alert("✅ Ürün başarıyla eklendi!");
+        alert("✅ Ürün eklendi");
       }
 
-      // 🔹 Form sıfırlama
+      // 🔄 Form sıfırla
       setNewProduct({
         name: "",
         description: "",
@@ -93,14 +149,14 @@ function AdminPanel() {
       });
       setImageFile(null);
       setPreviewUrl(null);
+      setSelectedBedenler([]);
+      setSelectedNumaralar([]);
 
+      // 🔁 Ürünleri tekrar yükle
       loadProducts();
     } catch (error) {
-      console.error("Ürün kaydedilemedi:", error.response || error);
-      alert(
-        "🚫 Ürün kaydedilirken hata oluştu!\n" +
-          (error.response?.data?.message || "")
-      );
+      console.error("Ürün kaydedilemedi:", error.response?.data || error);
+      alert("🚫 Hata: " + JSON.stringify(error.response?.data ?? {}, null, 2));
     }
   };
 
@@ -132,7 +188,7 @@ function AdminPanel() {
     }
   };
 
-  // 🖼️ Resim seçimi (önizleme dahil)
+  // 🖼️ Resim seçimi
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
@@ -183,15 +239,6 @@ function AdminPanel() {
           required
         />
         <input
-          placeholder="Kategori ID"
-          type="number"
-          value={newProduct.categoryId}
-          onChange={(e) =>
-            setNewProduct({ ...newProduct, categoryId: e.target.value })
-          }
-          required
-        />
-        <input
           placeholder="Stok"
           type="number"
           value={newProduct.stock}
@@ -200,6 +247,23 @@ function AdminPanel() {
           }
           required
         />
+
+        {/* 🔹 Kategori Dropdown */}
+        <label>Kategori:</label>
+        <select
+          value={newProduct.categoryId}
+          onChange={(e) =>
+            setNewProduct({ ...newProduct, categoryId: e.target.value })
+          }
+          required
+        >
+          <option value="">Seçiniz</option>
+          {categories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.name}
+            </option>
+          ))}
+        </select>
 
         {/* 🔹 Görsel yükleme alanı */}
         <input type="file" accept="image/*" onChange={handleImageChange} />
@@ -213,6 +277,42 @@ function AdminPanel() {
               width="120"
               style={{ borderRadius: "10px", border: "1px solid #ccc" }}
             />
+          </div>
+        )}
+
+        {/* 🔹 Giyim kategorisinde beden seçimi */}
+        {categories.find((c) => c.id === parseInt(newProduct.categoryId))
+          ?.name === "Giyim" && (
+          <div className="checkbox-group">
+            <label>Beden Seçimleri:</label>
+            {bedenler.map((b) => (
+              <div key={b.id}>
+                <input
+                  type="checkbox"
+                  onChange={() => handleBedenChange(b.id)}
+                  checked={selectedBedenler.includes(b.id)}
+                />
+                {b.bedenAdi}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 🔹 Ayakkabı kategorisinde numara seçimi */}
+        {categories.find((c) => c.id === parseInt(newProduct.categoryId))
+          ?.name === "Ayakkabı" && (
+          <div className="checkbox-group">
+            <label>Numara Seçimleri:</label>
+            {numaralar.map((n) => (
+              <div key={n.id}>
+                <input
+                  type="checkbox"
+                  onChange={() => handleNumaraChange(n.id)}
+                  checked={selectedNumaralar.includes(n.id)}
+                />
+                {n.numaraDegeri}
+              </div>
+            ))}
           </div>
         )}
 
@@ -235,6 +335,8 @@ function AdminPanel() {
               });
               setImageFile(null);
               setPreviewUrl(null);
+              setSelectedBedenler([]);
+              setSelectedNumaralar([]);
             }}
           >
             ❌ İptal
