@@ -1,18 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Navbar.css";
 
-function Navbar() {
+function Navbar({ setSearchTerm }) {
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
-  const role = localStorage.getItem("role"); // 🔹 Rol bilgisini alıyoruz (Admin veya User)
+  const role = localStorage.getItem("role");
+
+  const [query, setQuery] = useState("");
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
-    localStorage.removeItem("role"); // 🔹 Rol bilgisini de temizle
+    localStorage.removeItem("role");
     navigate("/login");
+  };
+
+  // 🔹 Kullanıcı her harf yazdığında arama anında filtreleniyor
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setQuery(value);
+    setSearchTerm(value);
+    navigate("/"); // Her zaman ürün listesindeyken filtre uygula
   };
 
   return (
@@ -23,8 +33,15 @@ function Navbar() {
         </h2>
       </div>
 
+      {/* 🔹 Arama çubuğu */}
       <div className="navbar-center">
-        <input type="text" placeholder="Ürün ara..." className="search-bar" />
+        <input
+          type="text"
+          placeholder="Ürün ara..."
+          className="search-bar"
+          value={query}
+          onChange={handleSearchChange}
+        />
       </div>
 
       <div className="navbar-right">
@@ -46,7 +63,6 @@ function Navbar() {
               ❤️ Favorilerim
             </button>
 
-            {/* 🔹 Eğer giriş yapan kişi admin ise admin butonları göster */}
             {role && role.toLowerCase() === "admin" && (
               <>
                 <button

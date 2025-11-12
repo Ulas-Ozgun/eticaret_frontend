@@ -111,13 +111,18 @@ function ProductList({ searchTerm }) {
             >
               <img
                 src={
-                  product.imageUrl
-                    ? `/${product.imageUrl}`
-                    : "/images/default.jpg"
+                  !product.imageUrl
+                    ? "https://via.placeholder.com/150" // hiç resim yoksa
+                    : product.imageUrl.startsWith("http")
+                    ? product.imageUrl // tam link (örneğin picsum.photos)
+                    : product.imageUrl.startsWith("/images")
+                    ? `https://localhost:7258${product.imageUrl}` // başında /images varsa
+                    : `https://localhost:7258/${product.imageUrl}` // sadece images/... varsa
                 }
                 alt={product.name}
                 className="product-image"
               />
+
               <h3>{product.name}</h3>
               <p>{product.description}</p>
               <span>{product.price} ₺</span>

@@ -17,7 +17,7 @@ function App() {
 
   return (
     <Router>
-      <Navbar />
+      <Navbar setSearchTerm={setSearchTerm} />
       <Routes>
         <Route path="/" element={<ProductList searchTerm={searchTerm} />} />
         <Route path="/cart" element={<CartPage />} />

@@ -162,7 +162,11 @@ function ProductDetail() {
         <div className="detail-left">
           <img
             src={
-              product.imageUrl ? `/${product.imageUrl}` : "/images/default.jpg"
+              !product.imageUrl
+                ? "https://via.placeholder.com/150"
+                : product.imageUrl.startsWith("http")
+                ? product.imageUrl
+                : `https://localhost:7258/${product.imageUrl}`
             }
             alt={product.name}
             className={`detail-image ${

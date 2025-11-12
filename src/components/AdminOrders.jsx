@@ -124,29 +124,31 @@ function AdminOrders() {
             </p>
             <p>
               <strong>Kullanıcı:</strong>{" "}
-              {selectedOrder.user?.name || "Bilinmiyor"}
+              {selectedOrder.userName || "Bilinmiyor"}
             </p>
             <p>
-              <strong>E-posta:</strong> {selectedOrder.user?.email || "—"}
+              <strong>E-posta:</strong> {selectedOrder.userEmail || "—"}
             </p>
             <p>
               <strong>Ürün:</strong>{" "}
-              {selectedOrder.product?.name || "Silinmiş Ürün"}
+              {selectedOrder.productName || "Silinmiş Ürün"}
             </p>
             <p>
-              <strong>Fiyat:</strong> {selectedOrder.product?.price} ₺
+              <strong>Fiyat:</strong> {selectedOrder.productPrice} ₺
             </p>
             <p>
               <strong>Adet:</strong> {selectedOrder.quantity}
+            </p>
+            <p>
+              <strong>Toplam:</strong> {selectedOrder.totalPrice} ₺
             </p>
             <p>
               <strong>Durum:</strong> {selectedOrder.status}
             </p>
             <p>
               <strong>Tarih:</strong>{" "}
-              {new Date(selectedOrder.createdAt || Date.now()).toLocaleString()}
+              {new Date(selectedOrder.orderDate).toLocaleString()}
             </p>
-
             <div className="modal-buttons">
               <button className="btn-close" onClick={closeModal}>
                 Kapat

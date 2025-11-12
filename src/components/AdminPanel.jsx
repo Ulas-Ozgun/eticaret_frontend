@@ -12,11 +12,12 @@ function AdminPanel() {
     name: "",
     description: "",
     price: "",
-    imageUrl: "",
     categoryId: "",
     stock: 0,
     status: "Aktif",
   });
+  const [imageFile, setImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const role = localStorage.getItem("role");
 
@@ -51,36 +52,47 @@ function AdminPanel() {
   const handleAddOrUpdate = async (e) => {
     e.preventDefault();
 
-    // 🔹 Backend tipleriyle uyumlu payload
-    const payload = {
-      ...newProduct,
-      category: undefined,
-      price: Number(newProduct.price),
-      stock: Number(newProduct.stock),
-      categoryId: Number(newProduct.categoryId),
-    };
-
     try {
       if (editingId) {
-        // ✏️ Düzenleme (PUT)
+        // ✏️ Güncelleme (PUT)
+        const payload = {
+          ...newProduct,
+          price: Number(newProduct.price),
+          stock: Number(newProduct.stock),
+          categoryId: Number(newProduct.categoryId),
+        };
+
         await axios.put(`${API_URL}/Product/${editingId}`, payload);
         alert("✏️ Ürün başarıyla güncellendi!");
         setEditingId(null);
       } else {
-        // ➕ Yeni ürün ekleme (POST)
-        await axios.post(`${API_URL}/Product`, payload);
+        // 📸 Yeni ürün ekleme (FormData ile resim dahil)
+        const formData = new FormData();
+        formData.append("Name", newProduct.name);
+        formData.append("Description", newProduct.description);
+        formData.append("Price", newProduct.price);
+        formData.append("Stock", newProduct.stock);
+        formData.append("CategoryId", newProduct.categoryId);
+        if (imageFile) formData.append("ImageFile", imageFile);
+
+        await axios.post(`${API_URL}/Product/add-with-image`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
         alert("✅ Ürün başarıyla eklendi!");
       }
 
+      // 🔹 Form sıfırlama
       setNewProduct({
         name: "",
         description: "",
         price: "",
-        imageUrl: "",
         categoryId: "",
         stock: 0,
         status: "Aktif",
       });
+      setImageFile(null);
+      setPreviewUrl(null);
 
       loadProducts();
     } catch (error) {
@@ -99,11 +111,11 @@ function AdminPanel() {
       name: product.name,
       description: product.description,
       price: product.price,
-      imageUrl: product.imageUrl,
       categoryId: product.categoryId,
       stock: product.stock,
       status: product.status,
     });
+    setPreviewUrl(`https://localhost:7258/${product.imageUrl}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -117,6 +129,17 @@ function AdminPanel() {
     } catch (error) {
       console.error("Ürün silinemedi:", error);
       alert("🚫 Ürün silinirken hata oluştu!");
+    }
+  };
+
+  // 🖼️ Resim seçimi (önizleme dahil)
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    setImageFile(file);
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setPreviewUrl(null);
     }
   };
 
@@ -160,13 +183,6 @@ function AdminPanel() {
           required
         />
         <input
-          placeholder="Görsel URL"
-          value={newProduct.imageUrl}
-          onChange={(e) =>
-            setNewProduct({ ...newProduct, imageUrl: e.target.value })
-          }
-        />
-        <input
           placeholder="Kategori ID"
           type="number"
           value={newProduct.categoryId}
@@ -184,9 +200,26 @@ function AdminPanel() {
           }
           required
         />
+
+        {/* 🔹 Görsel yükleme alanı */}
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+
+        {/* 🔹 Önizleme */}
+        {previewUrl && (
+          <div style={{ marginTop: "10px" }}>
+            <img
+              src={previewUrl}
+              alt="Seçilen ürün"
+              width="120"
+              style={{ borderRadius: "10px", border: "1px solid #ccc" }}
+            />
+          </div>
+        )}
+
         <button type="submit">
           {editingId ? "💾 Güncelle" : "➕ Ürün Ekle"}
         </button>
+
         {editingId && (
           <button
             type="button"
@@ -196,11 +229,12 @@ function AdminPanel() {
                 name: "",
                 description: "",
                 price: "",
-                imageUrl: "",
                 categoryId: "",
                 stock: 0,
                 status: "Aktif",
               });
+              setImageFile(null);
+              setPreviewUrl(null);
             }}
           >
             ❌ İptal
@@ -218,6 +252,7 @@ function AdminPanel() {
             <th>Fiyat</th>
             <th>Stok</th>
             <th>Durum</th>
+            <th>Görsel</th>
             <th>İşlemler</th>
           </tr>
         </thead>
@@ -229,6 +264,17 @@ function AdminPanel() {
               <td>{p.price} ₺</td>
               <td>{p.stock}</td>
               <td>{p.status}</td>
+              <td>
+                {p.imageUrl && (
+                  <img
+                    src={`https://localhost:7258/${p.imageUrl}`}
+                    alt={p.name}
+                    width="60"
+                    height="60"
+                    style={{ borderRadius: "8px" }}
+                  />
+                )}
+              </td>
               <td>
                 <button onClick={() => handleEdit(p)} className="btn-edit">
                   ✏️
