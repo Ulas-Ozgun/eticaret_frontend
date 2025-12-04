@@ -5,7 +5,7 @@
   background-color: #fffaf5;
   padding: 15px 40px; /* 🔹 biraz daraltıldı */
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
-  flex-wrap: wrap; /* 🔹 küçük ekranlarda taşma olmasın */
+   /* 🔹 küçük ekranlarda taşma olmasın */
 }
 
 .logo {
@@ -28,7 +28,7 @@
 
 .navbar-right {
   display: flex;
-  flex-wrap: wrap;
+  
   justify-content: flex-end;
   gap: 6px; /* 🔹 margin yerine boşluk verdik */
 }
@@ -93,4 +93,188 @@
 
 .btn-orders-control:hover {
   background-color: #27ae60;
+}
+
+/* Dropdown Menü */
+.navbar-categories {
+  position: relative;
+}
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-btn {
+  background-color: #ff7b00;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+  font-weight: 600;
+}
+
+.dropdown-btn:hover {
+  background-color: #e66a00;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 180px;
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  padding: 10px 0;
+  z-index: 999;
+}
+
+.dropdown-content span {
+  display: block;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.dropdown-content span:hover {
+  background-color: #ffefdd;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+/* 🔥 Kategori Dropdown Menüsü */
+.category-menu {
+  position: relative;
+  margin-left: 20px;
+}
+
+.category-button {
+  background-color: #ff7b00;
+  color: white;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.category-button:hover {
+  background-color: #e66900;
+}
+
+/* Dropdown kutusu */
+.category-dropdown {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 15px rgba(0,0,0,0.15);
+  min-width: 150px;
+  z-index: 999;
+  padding: 5px 0;
+}
+
+.dropdown-item {
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: 0.2s;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  background-color: #ffefdd;
+  color: #ff7b00;
+  font-weight: bold;
+}
+.category-dropdown {
+  position: relative;
+  margin-left: 20px;
+}
+
+.cat-btn {
+  background-color: #ff7b00;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.cat-btn:hover {
+  background-color: #e06d00;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 45px;
+  left: 0;
+  background: white;
+  padding: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 999;
+  min-width: 160px;
+}
+
+.category-dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.dropdown-menu button {
+  background: none;
+  border: none;
+  padding: 10px 15px;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f5f5f5;
+}
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* logo + kategori butonu arası */
+}
+
+.category-menu {
+  position: relative;
+}
+
+.category-button {
+  background-color: #ff7b00;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.category-dropdown {
+  position: absolute;
+  top: 40px;
+  left: 0;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  padding: 10px 0;
+  z-index: 1000;
+}
+
+.dropdown-item {
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+.dropdown-item:hover {
+  background: #ffe0c2;
 }

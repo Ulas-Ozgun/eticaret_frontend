@@ -1,0 +1,247 @@
+.slider-container {
+  width: 100%;
+  overflow: hidden;
+  margin: 20px 0;
+}
+
+.slider {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.slide-img {
+  width: 350px;
+  height: 180px;
+  border-radius: 12px;
+  object-fit: cover;
+  scroll-snap-align: start;
+}
+
+.slider-wrapper {
+  width: 100%;
+  overflow-x: scroll;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  background: transparent;
+  padding: 10px 0;
+}
+
+.slider-track {
+  display: flex;
+  gap: 0;
+}
+
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+
+
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: white;
+  font-size: 30px;
+  padding: 10px 15px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: 0.2s;
+}
+
+.slider-btn:hover {
+  background: rgba(0,0,0,0.7);
+}
+
+.slider-btn.left {
+  left: 10px;
+}
+
+.slider-btn.right {
+  right: 10px;
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+
+/* Dış kapsayıcı – hiçbir margin/padding istemiyoruz */
+.slider-wrapper {
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+/* Track – slider resimleri yan yana tutar */
+.slider-track {
+  display: flex;
+  width: 100%;
+  scroll-snap-type: x mandatory;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* FOTOĞRAFI TAM EKRAN YAPAN KOD */
+
+.full-slider-container {
+  width: 100%;
+  height: 300px; /* sabit banner yüksekliği */
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.full-slider-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;      /* tam doldur */
+  object-position: center center; /* ortala */
+  display: block;
+}
+.slider-wrapper {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  margin: 10px 0;
+}
+
+.slider-track {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.slider-track::-webkit-scrollbar {
+  display: none;
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.slider-image {
+  width: 100%;
+  height: auto;            /* 🔥 yükseklik otomatik */
+  max-height: 400px;        /* 🔥 çok büyümesin diye sınır */
+  object-fit: cover;        /* 🔥 kırp ama güzel doldur */
+  object-position: center;  /* 🔥 ortala */
+  display: block;
+  border-radius: 0;         /* istersen 0 */
+}
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 350px; /* istersen 300-400 ayarlayabilirsin */
+  overflow: hidden;
+}
+
+.slider-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;          /* foto kırp ama taşırma */
+  object-position: center;    /* tam ortadan hizala */
+  display: block;
+}
+
+.slider-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  color: white;
+  font-size: 30px;
+  padding: 8px 13px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transition: 0.2s;
+}
+
+.slider-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.slider-btn.left {
+  left: 15px;
+}
+
+.slider-btn.right {
+  right: 15px;
+}
+
+.slider-container {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+/* FOTOĞRAF ARKA PLAN OLARAK GELİYOR */
+.slider-bg {
+  width: 100%;
+  height: 100%;
+  background-size: cover;       /* 🔥 Foto tam ekran görünür */
+  background-position: center;  /* 🔥 Tam ortadan kırp */
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  transition: background-image 0.6s ease-in-out;
+}
+
+/* OK BUTONLARI */
+.arrow-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 28px;
+  background: rgba(0, 0, 0, 0.45);
+  color: white;
+  border: none;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  transition: 0.3s ease;
+}
+
+.arrow-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.arrow-btn.left {
+  left: 15px;
+}
+
+.arrow-btn.right {
+  right: 15px;
+}
+
+

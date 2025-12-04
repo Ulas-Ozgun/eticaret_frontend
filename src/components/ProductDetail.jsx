@@ -7,19 +7,44 @@ const API_URL = "https://localhost:7258/api";
 
 function ProductDetail() {
   const { id } = useParams();
+
+  const userId = localStorage.getItem("userId");
+
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState("");
-  const userId = localStorage.getItem("userId");
 
   const [bedenler, setBedenler] = useState([]);
   const [numaralar, setNumaralar] = useState([]);
+
   const [reviews, setReviews] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [rating, setRating] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
 
-  // 🔹 Ürün detayını yükle
+  // 🔥 1) Son bakılan ürün tablosuna kayıt
+  useEffect(() => {
+    if (!userId || !id) return;
+
+    const saveRecentView = async () => {
+      try {
+        await axios.post(`${API_URL}/RecentViews`, {
+          userId: Number(userId),
+          productId: Number(id),
+        });
+
+        // İstersen ana sayfadaki slider hemen güncellensin diye:
+        // (ProductList'te window.addEventListener("recent-updated", ...) ile dinleyebilirsin)
+        window.dispatchEvent(new Event("recent-updated"));
+      } catch (err) {
+        console.error("RecentViews kaydedilemedi:", err.response || err);
+      }
+    };
+
+    saveRecentView();
+  }, [id, userId]);
+
+  // 🔹 2) Ürün detayını yükle
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -29,10 +54,11 @@ function ProductDetail() {
         console.error("Ürün getirilemedi:", err);
       }
     };
-    fetchProduct();
+
+    if (id) fetchProduct();
   }, [id]);
 
-  // 🔹 Ürüne ait yorumları getir
+  // 🔹 3) Ürüne ait yorumları getir
   const fetchReviews = async () => {
     try {
       const res = await axios.get(`${API_URL}/Review/${id}`);
@@ -53,34 +79,41 @@ function ProductDetail() {
   };
 
   useEffect(() => {
-    fetchReviews();
+    if (id) fetchReviews();
   }, [id]);
 
-  // 🔹 Beden / Numara dinamik olarak çek
+  // 🔹 4) Beden / numara seçeneklerini getir
   useEffect(() => {
     const fetchOptions = async () => {
       try {
         if (product?.category?.name === "Giyim") {
           const res = await axios.get(`${API_URL}/Beden/byProduct/${id}`);
           setBedenler(res.data);
+        } else {
+          setBedenler([]);
         }
+
         if (product?.category?.name === "Ayakkabı") {
           const res = await axios.get(`${API_URL}/Numara/byProduct/${id}`);
           setNumaralar(res.data);
+        } else {
+          setNumaralar([]);
         }
       } catch (err) {
         console.error("Beden/numara verisi alınamadı:", err);
       }
     };
-    if (product) fetchOptions();
+
+    if (product && id) fetchOptions();
   }, [product, id]);
 
-  // 🔹 Sepete ekle
+  // 🔹 5) Sepete ekle
   const addToCart = async () => {
     if (!userId) {
       alert("🔐 Lütfen giriş yap!");
       return;
     }
+
     if (
       !selectedSize &&
       (product.category?.name === "Giyim" ||
@@ -104,12 +137,13 @@ function ProductDetail() {
     }
   };
 
-  // 🔹 Favorilere ekle
+  // 🔹 6) Favorilere ekle
   const addToFavorites = async () => {
     if (!userId) {
       alert("🔐 Favorilere eklemek için giriş yap!");
       return;
     }
+
     try {
       await axios.post(`${API_URL}/Favorite`, {
         userId: parseInt(userId),
@@ -122,9 +156,10 @@ function ProductDetail() {
     }
   };
 
-  // 🔹 Yorum gönder
+  // 🔹 7) Yorum gönder
   const submitReview = async (e) => {
     e.preventDefault();
+
     if (!userId) {
       alert("Yorum yapmak için giriş yapmalısın!");
       return;
@@ -151,7 +186,7 @@ function ProductDetail() {
     }
   };
 
-  // 🔹 Yorum sil
+  // 🔹 8) Yorum sil
   const deleteReview = async (reviewId) => {
     const confirmDelete = window.confirm(
       "Yorumu silmek istediğine emin misin?"
@@ -168,7 +203,9 @@ function ProductDetail() {
     }
   };
 
-  if (!product) return <p style={{ padding: "50px" }}>Yükleniyor...</p>;
+  if (!product) {
+    return <p style={{ padding: "50px" }}>Yükleniyor...</p>;
+  }
 
   return (
     <div className="detail-page">

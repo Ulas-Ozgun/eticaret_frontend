@@ -1,162 +1,166 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./ProductList.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import HomeSlider from "./HomeSlider";
 
 const API_URL = "https://localhost:7258/api";
 
 function ProductList({ searchTerm }) {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const location = useLocation();
   const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
 
-  // 🔹 Ürünleri yükle
+  const [products, setProducts] = useState([]);
+  const [recentViews, setRecentViews] = useState([]);
+
+  const params = new URLSearchParams(location.search);
+  const catId = params.get("catId");
+
+  // Ürünleri yükle
   const loadProducts = async () => {
     const res = await axios.get(`${API_URL}/Product`);
     setProducts(res.data);
   };
 
-  // 🔹 Kategorileri yükle
-  const loadCategories = async () => {
-    const res = await axios.get(`${API_URL}/Category`);
-    setCategories(res.data);
+  // Son bakılan ürünleri yükle
+  const loadRecentViews = async () => {
+    if (!userId) return;
+    const res = await axios.get(`${API_URL}/RecentViews/${userId}`);
+    setRecentViews(res.data);
   };
 
+  // 🔥 TEK useEffect → hem ürünleri hem recentleri yükler
   useEffect(() => {
     loadProducts();
-    loadCategories();
-  }, []);
+    loadRecentViews();
+  }, [location]);
 
-  // 🔹 Kategoriye göre filtreleme
-  const filteredProducts = products.filter((p) =>
-    selectedCategory
-      ? p.categoryId === selectedCategory
-      : p.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredProducts = products.filter((p) => {
+    const matchesSearch = p.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesCategory = catId ? p.categoryId === Number(catId) : true;
+    return matchesSearch && matchesCategory;
+  });
 
-  // 🔸 Sepete ekleme
+  // Sepet işlemi
   const addToCart = async (productId) => {
-    if (!userId) {
-      alert("🔐 Lütfen önce giriş yap!");
-      return;
-    }
-    try {
-      await axios.post(`${API_URL}/Cart`, {
-        userId: parseInt(userId),
-        productId,
-        quantity: 1,
-      });
-      alert("🛒 Ürün sepete eklendi!");
-    } catch (err) {
-      console.error("Sepete eklenemedi:", err);
-      alert("🚫 Sepete eklenirken hata oluştu!");
-    }
+    if (!userId) return alert("Lütfen giriş yapın!");
+    await axios.post(`${API_URL}/Cart`, {
+      userId: Number(userId),
+      productId,
+      quantity: 1,
+    });
+    alert("Sepete eklendi!");
   };
 
-  // ❤️ Favorilere ekleme
+  // Favori işlemi
   const addToFavorites = async (productId) => {
-    if (!userId) {
-      alert("🔐 Favorilere eklemek için önce giriş yap!");
-      return;
-    }
-    try {
-      await axios.post(`${API_URL}/Favorite`, {
-        userId: parseInt(userId),
-        productId,
-      });
-      alert("❤️ Ürün favorilere eklendi!");
-    } catch (err) {
-      console.error("Favori eklenemedi:", err);
-      alert("🚫 Favorilere eklenirken hata oluştu!");
-    }
+    if (!userId) return alert("Favori için giriş yapmalısınız!");
+    await axios.post(`${API_URL}/Favorite`, {
+      userId: Number(userId),
+      productId,
+    });
+    alert("Favorilere eklendi!");
   };
 
   return (
-    <div className="product-list-container">
-      {/* 🔹 Kategori butonları */}
-      <div className="category-buttons">
-        <button
-          className={`category-btn ${!selectedCategory ? "active" : ""}`}
-          onClick={() => setSelectedCategory(null)}
-        >
-          Tümü
-        </button>
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            className={`category-btn ${
-              selectedCategory === cat.id ? "active" : ""
-            }`}
-            onClick={() => setSelectedCategory(cat.id)}
-          >
-            {cat.name}
-          </button>
-        ))}
-      </div>
+    <>
+      <HomeSlider />
 
-      {/* 🔹 Ürün kartları */}
-      <div className="product-grid">
-        {filteredProducts.length === 0 ? (
-          <p>Ürün bulunamadı 😢</p>
-        ) : (
-          filteredProducts.map((product) => (
-            <div
-              key={product.id}
-              className="product-card"
-              onClick={() => navigate(`/product/${product.id}`)}
-              style={{ cursor: "pointer" }}
-            >
-              <img
-                src={
-                  !product.imageUrl
-                    ? "https://via.placeholder.com/150" // hiç resim yoksa
-                    : product.imageUrl.startsWith("http")
-                    ? product.imageUrl // tam link (örneğin picsum.photos)
-                    : product.imageUrl.startsWith("/images")
-                    ? `https://localhost:7258${product.imageUrl}` // başında /images varsa
-                    : `https://localhost:7258/${product.imageUrl}` // sadece images/... varsa
-                }
-                alt={product.name}
-                className="product-image"
-              />
-
-              <h3>{product.name}</h3>
-              <p>{product.description}</p>
-              <span>{product.price} ₺</span>
-              <div className="stock-status">
-                {product.stock > 0 ? (
-                  <span className="in-stock">
-                    🟢 Stokta var ({product.stock})
-                  </span>
-                ) : (
-                  <span className="out-stock">🔴 Tükendi</span>
-                )}
+      {/* 🔥 SON BAKILANLAR */}
+      {recentViews.length > 0 && (
+        <>
+          <h2 className="recent-title">🔍 Son Görüntülenenler</h2>
+          <div className="recent-slider">
+            {recentViews.map((rv) => (
+              <div
+                key={rv.id}
+                className="recent-item"
+                onClick={() => navigate(`/product/${rv.productId}`)}
+              >
+                <img
+                  src={
+                    rv.imageUrl?.startsWith("http")
+                      ? rv.imageUrl
+                      : `https://localhost:7258/${rv.imageUrl}`
+                  }
+                  alt={rv.productName}
+                />
+                <div className="recent-title">{rv.productName}</div>
               </div>
+            ))}
+          </div>
+        </>
+      )}
 
-              <div className="card-buttons">
+      {/* 🔥 ÜRÜNLER */}
+      <div className="product-list-container">
+        <div className="product-grid">
+          {filteredProducts.length === 0 ? (
+            <p>Ürün bulunamadı 😢</p>
+          ) : (
+            filteredProducts.map((product) => (
+              <div key={product.id} className="product-card">
                 <button
-                  onClick={() => addToCart(product.id)}
-                  disabled={product.stock <= 0}
-                  style={{
-                    opacity: product.stock <= 0 ? 0.5 : 1,
-                    cursor: product.stock <= 0 ? "not-allowed" : "pointer",
+                  className="fav-icon"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToFavorites(product.id);
                   }}
                 >
-                  🛒 Sepete Ekle
+                  ❤️
                 </button>
 
-                <button onClick={() => addToFavorites(product.id)}>
-                  ❤️ Favorilere Ekle
-                </button>
+                <div
+                  className="product-img-wrapper"
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
+                  <img
+                    src={
+                      product.imageUrl?.startsWith("http")
+                        ? product.imageUrl
+                        : `https://localhost:7258/${product.imageUrl}`
+                    }
+                    alt={product.name}
+                    className="product-image"
+                  />
+                </div>
+
+                <div className="product-info">
+                  <h3>{product.name}</h3>
+                  <p>{product.description}</p>
+
+                  <div className="product-bottom">
+                    <span className="price">{product.price} ₺</span>
+
+                    <button
+                      className="add-btn"
+                      onClick={() => addToCart(product.id)}
+                      disabled={product.stock <= 0}
+                    >
+                      🛒 Sepete Ekle
+                    </button>
+                  </div>
+
+                  <div className="stock-status">
+                    {product.stock > 0 ? (
+                      <span className="in-stock">
+                        🟢 {product.stock} adet var
+                      </span>
+                    ) : (
+                      <span className="out-stock">🔴 Tükendi</span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))
-        )}
+            ))
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

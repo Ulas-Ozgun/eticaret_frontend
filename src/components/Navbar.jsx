@@ -1,6 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "./Navbar.css";
+
+const API_URL = "https://localhost:7258/api";
 
 function Navbar({ setSearchTerm }) {
   const navigate = useNavigate();
@@ -9,6 +12,14 @@ function Navbar({ setSearchTerm }) {
   const role = localStorage.getItem("role");
 
   const [query, setQuery] = useState("");
+  const [categories, setCategories] = useState([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  useEffect(() => {
+    axios.get(`${API_URL}/Category`).then((res) => {
+      setCategories(res.data);
+    });
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("userId");
@@ -17,12 +28,17 @@ function Navbar({ setSearchTerm }) {
     navigate("/login");
   };
 
-  // 🔹 Kullanıcı her harf yazdığında arama anında filtreleniyor
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setQuery(value);
     setSearchTerm(value);
-    navigate("/"); // Her zaman ürün listesindeyken filtre uygula
+    navigate("/");
+  };
+
+  // 🔥 ID’ye göre filtreleme
+  const handleCategorySelect = (catId) => {
+    navigate(`/?catId=${catId}`);
+    setDropdownOpen(false);
   };
 
   return (
@@ -31,9 +47,31 @@ function Navbar({ setSearchTerm }) {
         <h2 className="logo" onClick={() => navigate("/")}>
           🛍️ ÖZGÜN <span>SHOP</span>
         </h2>
+
+        <div className="category-menu">
+          <button
+            className="category-button"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+          >
+            Kategoriler ▾
+          </button>
+
+          {dropdownOpen && (
+            <div className="category-dropdown">
+              {categories.map((cat) => (
+                <div
+                  key={cat.id}
+                  className="dropdown-item"
+                  onClick={() => handleCategorySelect(cat.id)}
+                >
+                  {cat.name}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* 🔹 Arama çubuğu */}
       <div className="navbar-center">
         <input
           type="text"
@@ -63,7 +101,7 @@ function Navbar({ setSearchTerm }) {
               ❤️ Favorilerim
             </button>
 
-            {role && role.toLowerCase() === "admin" && (
+            {role?.toLowerCase() === "admin" && (
               <>
                 <button
                   onClick={() => navigate("/admin-panel")}
