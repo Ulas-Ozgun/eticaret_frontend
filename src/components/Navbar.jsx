@@ -14,13 +14,18 @@ function Navbar({ setSearchTerm }) {
   const [query, setQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [subCategories, setSubCategories] = useState([]);
 
+  // 🔥 Kategoriler + Alt Kategoriler çekiliyor
   useEffect(() => {
-    axios.get(`${API_URL}/Category`).then((res) => {
-      setCategories(res.data);
+    axios.get(`${API_URL}/Category`).then((res) => setCategories(res.data));
+
+    axios.get(`${API_URL}/SubCategory`).then((res) => {
+      setSubCategories(res.data);
     });
   }, []);
 
+  // Çıkış
   const handleLogout = () => {
     localStorage.removeItem("userId");
     localStorage.removeItem("userName");
@@ -28,17 +33,12 @@ function Navbar({ setSearchTerm }) {
     navigate("/login");
   };
 
+  // Arama
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setQuery(value);
     setSearchTerm(value);
     navigate("/");
-  };
-
-  // 🔥 ID’ye göre filtreleme
-  const handleCategorySelect = (catId) => {
-    navigate(`/?catId=${catId}`);
-    setDropdownOpen(false);
   };
 
   return (
@@ -48,6 +48,7 @@ function Navbar({ setSearchTerm }) {
           🛍️ ÖZGÜN <span>SHOP</span>
         </h2>
 
+        {/* KATEGORİLER BUTONU */}
         <div className="category-menu">
           <button
             className="category-button"
@@ -56,15 +57,39 @@ function Navbar({ setSearchTerm }) {
             Kategoriler ▾
           </button>
 
+          {/* 🔥 MEGA MENU */}
           {dropdownOpen && (
-            <div className="category-dropdown">
+            <div className="category-dropdown mega-menu">
               {categories.map((cat) => (
-                <div
-                  key={cat.id}
-                  className="dropdown-item"
-                  onClick={() => handleCategorySelect(cat.id)}
-                >
-                  {cat.name}
+                <div key={cat.id} className="mega-category">
+                  {/* Ana kategori başlık */}
+                  <div
+                    className="mega-title"
+                    onClick={() => {
+                      navigate(`/?catId=${cat.id}`);
+                      setDropdownOpen(false);
+                    }}
+                  >
+                    {cat.name}
+                  </div>
+
+                  {/* Alt Kategoriler */}
+                  <div className="mega-sub-list">
+                    {subCategories
+                      .filter((sc) => sc.categoryId === cat.id)
+                      .map((sc) => (
+                        <div
+                          key={sc.id}
+                          className="mega-sub-item"
+                          onClick={() => {
+                            navigate(`/?catId=${cat.id}&subId=${sc.id}`);
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          {sc.name}
+                        </div>
+                      ))}
+                  </div>
                 </div>
               ))}
             </div>
@@ -72,6 +97,7 @@ function Navbar({ setSearchTerm }) {
         </div>
       </div>
 
+      {/* ARAMA */}
       <div className="navbar-center">
         <input
           type="text"
@@ -82,6 +108,7 @@ function Navbar({ setSearchTerm }) {
         />
       </div>
 
+      {/* SAĞ MENÜ */}
       <div className="navbar-right">
         {userId && (
           <>

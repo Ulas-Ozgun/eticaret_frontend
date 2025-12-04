@@ -16,11 +16,16 @@ function AdminPanel() {
     stock: 0,
     status: "Aktif",
   });
+
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
 
-  // 🔹 Yeni eklenen state’ler
   const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
+  const [filteredSubs, setFilteredSubs] = useState([]);
+
+  const [selectedSubCategory, setSelectedSubCategory] = useState("");
+
   const [bedenler, setBedenler] = useState([]);
   const [numaralar, setNumaralar] = useState([]);
   const [selectedBedenler, setSelectedBedenler] = useState([]);
@@ -28,141 +33,106 @@ function AdminPanel() {
 
   const role = localStorage.getItem("role");
 
+  // -----------------------------
+  // 🔥 İlk yüklemeler
+  // -----------------------------
   useEffect(() => {
     if (role === "Admin") {
       loadProducts();
       loadOrders();
       loadOptions();
-      loadCategories();
     }
   }, [role]);
 
-  // 🧱 Ürünleri yükle
+  useEffect(() => {
+    axios.get(`${API_URL}/Category`).then((res) => setCategories(res.data));
+    axios
+      .get(`${API_URL}/SubCategory`)
+      .then((res) => setSubCategories(res.data));
+  }, []);
+
+  // Ürünleri getir
   const loadProducts = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/Product`);
-      setProducts(res.data);
-    } catch (error) {
-      console.error("Ürünler yüklenemedi:", error);
-    }
+    const res = await axios.get(`${API_URL}/Product`);
+    setProducts(res.data);
   };
 
-  // 🧾 Siparişleri yükle
+  // Siparişleri getir
   const loadOrders = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/Order/all`);
-      setOrders(res.data);
-    } catch (error) {
-      console.error("Siparişler yüklenemedi:", error);
-    }
+    const res = await axios.get(`${API_URL}/Order/all`);
+    setOrders(res.data);
   };
 
-  // 🧩 Beden / numara listelerini çek
+  // Beden ve numaraları getir
   const loadOptions = async () => {
-    try {
-      const [bedenRes, numaraRes] = await Promise.all([
-        axios.get(`${API_URL}/Beden`),
-        axios.get(`${API_URL}/Numara`),
-      ]);
-      setBedenler(bedenRes.data);
-      setNumaralar(numaraRes.data);
-    } catch (err) {
-      console.error("Beden/numara verileri alınamadı:", err);
-    }
+    const [bedenRes, numaraRes] = await Promise.all([
+      axios.get(`${API_URL}/Beden`),
+      axios.get(`${API_URL}/Numara`),
+    ]);
+
+    setBedenler(bedenRes.data);
+    setNumaralar(numaraRes.data);
   };
 
-  // 🔹 Kategorileri çek
-  const loadCategories = async () => {
-    try {
-      const res = await axios.get(`${API_URL}/Category`);
-      setCategories(res.data);
-    } catch (error) {
-      console.error("Kategoriler alınamadı:", error);
-    }
+  // --------------------------------
+  // 🔥 Kategori değişince alt kategori filtrele
+  // --------------------------------
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+
+    setNewProduct({ ...newProduct, categoryId: value });
+    const subs = subCategories.filter((sc) => sc.categoryId === Number(value));
+    setFilteredSubs(subs);
+
+    setSelectedSubCategory(""); // reset
   };
 
-  // ✅ Checkbox seçimleri
-  const handleBedenChange = (id) => {
-    setSelectedBedenler((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  const handleNumaraChange = (id) => {
-    setSelectedNumaralar((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
-  };
-
-  // ➕ Ürün ekle veya güncelle
-  // ➕ Ürün ekle veya güncelle
+  // --------------------------------
+  // 🔥 Ürün ekle / güncelle
+  // --------------------------------
   const handleAddOrUpdate = async (e) => {
     e.preventDefault();
 
-    try {
-      const formData = new FormData();
-      formData.append("Name", String(newProduct.name ?? ""));
-      formData.append("Description", String(newProduct.description ?? ""));
-      formData.append("Price", String(newProduct.price ?? 0));
-      formData.append("Stock", String(newProduct.stock ?? 0));
-      formData.append("CategoryId", String(newProduct.categoryId ?? 0));
+    const formData = new FormData();
+    formData.append("Name", newProduct.name);
+    formData.append("Description", newProduct.description);
+    formData.append("Price", newProduct.price);
+    formData.append("Stock", newProduct.stock);
+    formData.append("CategoryId", newProduct.categoryId);
+    formData.append("SubCategoryId", selectedSubCategory);
 
-      if (imageFile) {
-        formData.append("ImageFile", imageFile);
-      }
-
-      // ✅ Seçilen bedenleri ekle
-      if (selectedBedenler && selectedBedenler.length > 0) {
-        selectedBedenler.forEach((id) =>
-          formData.append("BedenIds", String(id))
-        );
-      }
-
-      // ✅ Seçilen numaraları ekle
-      if (selectedNumaralar && selectedNumaralar.length > 0) {
-        selectedNumaralar.forEach((id) =>
-          formData.append("NumaraIds", String(id))
-        );
-      }
-
-      if (editingId) {
-        await axios.put(`${API_URL}/Product/${editingId}`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        alert("✏️ Ürün güncellendi");
-        setEditingId(null);
-      } else {
-        await axios.post(`${API_URL}/Product/add-with-image`, formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-        alert("✅ Ürün eklendi");
-      }
-
-      // 🔄 Form sıfırla
-      setNewProduct({
-        name: "",
-        description: "",
-        price: "",
-        categoryId: "",
-        stock: 0,
-        status: "Aktif",
-      });
-      setImageFile(null);
-      setPreviewUrl(null);
-      setSelectedBedenler([]);
-      setSelectedNumaralar([]);
-
-      // 🔁 Ürünleri tekrar yükle
-      loadProducts();
-    } catch (error) {
-      console.error("Ürün kaydedilemedi:", error.response?.data || error);
-      alert("🚫 Hata: " + JSON.stringify(error.response?.data ?? {}, null, 2));
+    if (imageFile) {
+      formData.append("ImageFile", imageFile);
     }
+
+    selectedBedenler.forEach((id) => formData.append("BedenIds", id));
+    selectedNumaralar.forEach((id) => formData.append("NumaraIds", id));
+
+    if (editingId) {
+      await axios.put(`${API_URL}/Product/${editingId}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("✏️ Ürün güncellendi");
+      setEditingId(null);
+    } else {
+      await axios.post(`${API_URL}/Product/add-with-image`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      alert("✅ Ürün eklendi");
+    }
+
+    resetForm();
+    loadProducts();
   };
 
-  // ✏️ Ürünü düzenleme moduna al
+  // --------------------------------
+  // 🔧 Düzenleme moduna alma
+  // --------------------------------
   const handleEdit = (product) => {
     setEditingId(product.id);
+
     setNewProduct({
       name: product.name,
       description: product.description,
@@ -171,39 +141,61 @@ function AdminPanel() {
       stock: product.stock,
       status: product.status,
     });
+
     setPreviewUrl(`https://localhost:7258/${product.imageUrl}`);
+
+    // 🔥 Alt kategori otomatik gelsin
+    const subs = subCategories.filter(
+      (sc) => sc.categoryId === product.categoryId
+    );
+    setFilteredSubs(subs);
+    setSelectedSubCategory(product.subCategoryId || "");
+
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // 🗑️ Ürün sil
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bu ürünü silmek istediğine emin misin?")) return;
-    try {
-      await axios.delete(`${API_URL}/Product/${id}`);
-      alert("🗑️ Ürün başarıyla silindi!");
-      loadProducts();
-    } catch (error) {
-      console.error("Ürün silinemedi:", error);
-      alert("🚫 Ürün silinirken hata oluştu!");
-    }
+  // --------------------------------
+  // 🧹 Form sıfırlama
+  // --------------------------------
+  const resetForm = () => {
+    setNewProduct({
+      name: "",
+      description: "",
+      price: "",
+      categoryId: "",
+      stock: 0,
+      status: "Aktif",
+    });
+
+    setImageFile(null);
+    setPreviewUrl(null);
+    setSelectedBedenler([]);
+    setSelectedNumaralar([]);
+    setSelectedSubCategory("");
   };
 
-  // 🖼️ Resim seçimi
+  // --------------------------------
+  // 🗑 Ürün silme
+  // --------------------------------
+  const handleDelete = async (id) => {
+    if (!window.confirm("Silmek istediğine emin misin?")) return;
+
+    await axios.delete(`${API_URL}/Product/${id}`);
+    loadProducts();
+  };
+
+  // --------------------------------
+  // 🖼 Resim seçme
+  // --------------------------------
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
-    if (file) {
-      setPreviewUrl(URL.createObjectURL(file));
-    } else {
-      setPreviewUrl(null);
-    }
+    if (file) setPreviewUrl(URL.createObjectURL(file));
   };
 
   if (role !== "Admin") {
     return (
-      <div style={{ padding: "40px", textAlign: "center", color: "red" }}>
-        <h2>🚫 Bu sayfaya erişim izniniz yok</h2>
-      </div>
+      <h2 style={{ padding: 50, color: "red" }}>🚫 Bu sayfaya erişimin yok</h2>
     );
   }
 
@@ -211,7 +203,7 @@ function AdminPanel() {
     <div className="admin-panel">
       <h1>🛠️ Admin Paneli</h1>
 
-      {/* Ürün Ekle / Düzenle Formu */}
+      {/* FORM */}
       <form className="add-form" onSubmit={handleAddOrUpdate}>
         <input
           placeholder="Ürün Adı"
@@ -219,7 +211,6 @@ function AdminPanel() {
           onChange={(e) =>
             setNewProduct({ ...newProduct, name: e.target.value })
           }
-          required
         />
         <input
           placeholder="Açıklama"
@@ -227,8 +218,8 @@ function AdminPanel() {
           onChange={(e) =>
             setNewProduct({ ...newProduct, description: e.target.value })
           }
-          required
         />
+
         <input
           placeholder="Fiyat"
           type="number"
@@ -236,8 +227,8 @@ function AdminPanel() {
           onChange={(e) =>
             setNewProduct({ ...newProduct, price: e.target.value })
           }
-          required
         />
+
         <input
           placeholder="Stok"
           type="number"
@@ -245,18 +236,11 @@ function AdminPanel() {
           onChange={(e) =>
             setNewProduct({ ...newProduct, stock: e.target.value })
           }
-          required
         />
 
-        {/* 🔹 Kategori Dropdown */}
-        <label>Kategori:</label>
-        <select
-          value={newProduct.categoryId}
-          onChange={(e) =>
-            setNewProduct({ ...newProduct, categoryId: e.target.value })
-          }
-          required
-        >
+        {/* Kategori */}
+        <label>Kategori</label>
+        <select value={newProduct.categoryId} onChange={handleCategoryChange}>
           <option value="">Seçiniz</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
@@ -265,55 +249,25 @@ function AdminPanel() {
           ))}
         </select>
 
-        {/* 🔹 Görsel yükleme alanı */}
+        {/* Alt Kategori */}
+        <label>Alt Kategori</label>
+        <select
+          value={selectedSubCategory}
+          onChange={(e) => setSelectedSubCategory(e.target.value)}
+        >
+          <option value="">Seçiniz</option>
+          {filteredSubs.map((sub) => (
+            <option key={sub.id} value={sub.id}>
+              {sub.name}
+            </option>
+          ))}
+        </select>
+
+        {/* Görsel */}
         <input type="file" accept="image/*" onChange={handleImageChange} />
 
-        {/* 🔹 Önizleme */}
         {previewUrl && (
-          <div style={{ marginTop: "10px" }}>
-            <img
-              src={previewUrl}
-              alt="Seçilen ürün"
-              width="120"
-              style={{ borderRadius: "10px", border: "1px solid #ccc" }}
-            />
-          </div>
-        )}
-
-        {/* 🔹 Giyim kategorisinde beden seçimi */}
-        {categories.find((c) => c.id === parseInt(newProduct.categoryId))
-          ?.name === "Giyim" && (
-          <div className="checkbox-group">
-            <label>Beden Seçimleri:</label>
-            {bedenler.map((b) => (
-              <div key={b.id}>
-                <input
-                  type="checkbox"
-                  onChange={() => handleBedenChange(b.id)}
-                  checked={selectedBedenler.includes(b.id)}
-                />
-                {b.bedenAdi}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* 🔹 Ayakkabı kategorisinde numara seçimi */}
-        {categories.find((c) => c.id === parseInt(newProduct.categoryId))
-          ?.name === "Ayakkabı" && (
-          <div className="checkbox-group">
-            <label>Numara Seçimleri:</label>
-            {numaralar.map((n) => (
-              <div key={n.id}>
-                <input
-                  type="checkbox"
-                  onChange={() => handleNumaraChange(n.id)}
-                  checked={selectedNumaralar.includes(n.id)}
-                />
-                {n.numaraDegeri}
-              </div>
-            ))}
-          </div>
+          <img src={previewUrl} width="120" style={{ borderRadius: 8 }} />
         )}
 
         <button type="submit">
@@ -321,24 +275,7 @@ function AdminPanel() {
         </button>
 
         {editingId && (
-          <button
-            type="button"
-            onClick={() => {
-              setEditingId(null);
-              setNewProduct({
-                name: "",
-                description: "",
-                price: "",
-                categoryId: "",
-                stock: 0,
-                status: "Aktif",
-              });
-              setImageFile(null);
-              setPreviewUrl(null);
-              setSelectedBedenler([]);
-              setSelectedNumaralar([]);
-            }}
-          >
+          <button onClick={resetForm} type="button">
             ❌ İptal
           </button>
         )}
@@ -354,10 +291,13 @@ function AdminPanel() {
             <th>Fiyat</th>
             <th>Stok</th>
             <th>Durum</th>
+            <th>Kategori</th>
+            <th>Alt Kategori</th>
             <th>Görsel</th>
             <th>İşlemler</th>
           </tr>
         </thead>
+
         <tbody>
           {products.map((p) => (
             <tr key={p.id}>
@@ -366,14 +306,14 @@ function AdminPanel() {
               <td>{p.price} ₺</td>
               <td>{p.stock}</td>
               <td>{p.status}</td>
+              <td>{p.category?.name}</td>
+              <td>{p.subCategory?.name || "-"}</td> {/* 🔥 ALT KATEGORİ */}
               <td>
                 {p.imageUrl && (
                   <img
                     src={`https://localhost:7258/${p.imageUrl}`}
-                    alt={p.name}
                     width="60"
                     height="60"
-                    style={{ borderRadius: "8px" }}
                   />
                 )}
               </td>
@@ -393,7 +333,7 @@ function AdminPanel() {
         </tbody>
       </table>
 
-      {/* Sipariş Listesi */}
+      {/* Siparişler */}
       <h2>📜 Siparişler</h2>
       <table>
         <thead>
