@@ -17,12 +17,17 @@ function ProductList({ searchTerm }) {
 
   const params = new URLSearchParams(location.search);
   const catId = params.get("catId");
-  const subId = params.get("subId"); // ⭐ Alt kategori ID
 
   // Ürünleri yükle
   const loadProducts = async () => {
-    const res = await axios.get(`${API_URL}/Product`);
-    setProducts(res.data);
+    try {
+      const res = await axios.get(`${API_URL}/Product`);
+      console.log("API'den gelen ürünler:", res.data?.length, "adet");
+      setProducts(res.data || []);
+    } catch (error) {
+      console.error("Ürünler yüklenirken hata:", error);
+      setProducts([]);
+    }
   };
 
   // Son bakılan ürünleri yükle
@@ -38,18 +43,12 @@ function ProductList({ searchTerm }) {
     loadRecentViews();
   }, [location]);
 
-  // ⭐ FİLTRELEME
   const filteredProducts = products.filter((p) => {
     const matchesSearch = p.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
-
     const matchesCategory = catId ? p.categoryId === Number(catId) : true;
-
-    // ⭐ SUBCATEGORY FİLTRESİ → ürün modelinde subCategoryId olmalı
-    const matchesSubCategory = subId ? p.subCategoryId === Number(subId) : true;
-
-    return matchesSearch && matchesCategory && matchesSubCategory;
+    return matchesSearch && matchesCategory;
   });
 
   // Sepet işlemi

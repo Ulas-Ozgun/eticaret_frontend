@@ -14,15 +14,10 @@ function Navbar({ setSearchTerm }) {
   const [query, setQuery] = useState("");
   const [categories, setCategories] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [subCategories, setSubCategories] = useState([]);
 
-  // 🔥 Kategoriler + Alt Kategoriler çekiliyor
+  // 🔥 Sadece ana kategoriler çekiliyor
   useEffect(() => {
     axios.get(`${API_URL}/Category`).then((res) => setCategories(res.data));
-
-    axios.get(`${API_URL}/SubCategory`).then((res) => {
-      setSubCategories(res.data);
-    });
   }, []);
 
   // Çıkış
@@ -57,39 +52,19 @@ function Navbar({ setSearchTerm }) {
             Kategoriler ▾
           </button>
 
-          {/* 🔥 MEGA MENU */}
+          {/* 🔥 SADECE ANA KATEGORİLER */}
           {dropdownOpen && (
-            <div className="category-dropdown mega-menu">
+            <div className="category-dropdown">
               {categories.map((cat) => (
-                <div key={cat.id} className="mega-category">
-                  {/* Ana kategori başlık */}
-                  <div
-                    className="mega-title"
-                    onClick={() => {
-                      navigate(`/?catId=${cat.id}`);
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    {cat.name}
-                  </div>
-
-                  {/* Alt Kategoriler */}
-                  <div className="mega-sub-list">
-                    {subCategories
-                      .filter((sc) => sc.categoryId === cat.id)
-                      .map((sc) => (
-                        <div
-                          key={sc.id}
-                          className="mega-sub-item"
-                          onClick={() => {
-                            navigate(`/?catId=${cat.id}&subId=${sc.id}`);
-                            setDropdownOpen(false);
-                          }}
-                        >
-                          {sc.name}
-                        </div>
-                      ))}
-                  </div>
+                <div
+                  key={cat.id}
+                  className="category-item"
+                  onClick={() => {
+                    navigate(`/?catId=${cat.id}`);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  {cat.name}
                 </div>
               ))}
             </div>
@@ -142,6 +117,17 @@ function Navbar({ setSearchTerm }) {
                   className="btn-orders-control"
                 >
                   📦 Siparişleri Yönet
+                </button>
+              </>
+            )}
+
+            {role?.toLowerCase() === "satıcı" && (
+              <>
+                <button
+                  onClick={() => navigate("/seller-panel")}
+                  className="btn-admin"
+                >
+                  🏪 Satıcı Paneli
                 </button>
               </>
             )}

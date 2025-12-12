@@ -10,6 +10,7 @@ import OrdersPage from "./components/OrdersPage";
 import Navbar from "./components/Navbar";
 import AdminPanel from "./components/AdminPanel";
 import AdminOrders from "./components/AdminOrders";
+import SellerPanel from "./components/SellerPanel";
 import "./App.css";
 
 function App() {
@@ -27,8 +28,8 @@ function App() {
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route path="/orders" element={<OrdersPage />} />
         <Route path="/admin-panel" element={<AdminPanel />} />
-        <Route path="/admin-orders" element={<AdminOrders />} />{" "}
-        {/* ✅ doğru path */}
+        <Route path="/admin-orders" element={<AdminOrders />} />
+        <Route path="/seller-panel" element={<SellerPanel />} />
       </Routes>
     </Router>
   );

@@ -120,7 +120,11 @@ function CartPage() {
               <div className="cart-item" key={item.id}>
                 <img
                   src={
-                    item.product.imageUrl || "https://via.placeholder.com/120"
+                    !item.product.imageUrl
+                      ? "https://via.placeholder.com/120"
+                      : item.product.imageUrl.startsWith("http")
+                      ? item.product.imageUrl
+                      : `https://localhost:7258/${item.product.imageUrl}`
                   }
                   alt={item.product.name}
                   className="cart-image"

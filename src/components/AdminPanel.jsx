@@ -6,6 +6,7 @@ const API_URL = "https://localhost:7258/api";
 
 function AdminPanel() {
   const [products, setProducts] = useState([]);
+  const [pendingProducts, setPendingProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [newProduct, setNewProduct] = useState({
@@ -39,6 +40,7 @@ function AdminPanel() {
   useEffect(() => {
     if (role === "Admin") {
       loadProducts();
+      loadPendingProducts();
       loadOrders();
       loadOptions();
     }
@@ -51,10 +53,23 @@ function AdminPanel() {
       .then((res) => setSubCategories(res.data));
   }, []);
 
-  // Ürünleri getir
+  // Ürünleri getir (tüm ürünler - onaylanmış ve bekleyen)
   const loadProducts = async () => {
-    const res = await axios.get(`${API_URL}/Product`);
+    const res = await axios.get(`${API_URL}/Product?includePending=true`);
     setProducts(res.data);
+  };
+
+  // Bekleyen ürünleri getir
+  const loadPendingProducts = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/Product/pending`);
+      console.log("Bekleyen ürünler:", res.data);
+      setPendingProducts(res.data || []);
+    } catch (error) {
+      console.error("Bekleyen ürünler yüklenemedi:", error);
+      console.error("Hata detayı:", error.response?.data);
+      setPendingProducts([]);
+    }
   };
 
   // Siparişleri getir
@@ -142,7 +157,11 @@ function AdminPanel() {
       status: product.status,
     });
 
-    setPreviewUrl(`https://localhost:7258/${product.imageUrl}`);
+    setPreviewUrl(
+      product.imageUrl?.startsWith("http")
+        ? product.imageUrl
+        : `https://localhost:7258/${product.imageUrl}`
+    );
 
     // 🔥 Alt kategori otomatik gelsin
     const subs = subCategories.filter(
@@ -281,8 +300,139 @@ function AdminPanel() {
         )}
       </form>
 
+      {/* Bekleyen Ürünler (Onay Bekleyen) */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+        <h2>⏳ Onay Bekleyen Ürünler {pendingProducts.length > 0 && `(${pendingProducts.length})`}</h2>
+        <button
+          onClick={async () => {
+            if (window.confirm("Tüm bekleyen ürünleri onaylamak istediğinize emin misiniz?")) {
+              try {
+                const res = await axios.post(`${API_URL}/Product/approve-all`);
+                alert(res.data.message || "✅ Tüm ürünler onaylandı!");
+                loadPendingProducts();
+                loadProducts();
+              } catch (error) {
+                alert("❌ Hata: " + (error.response?.data?.message || error.message));
+              }
+            }
+          }}
+          style={{
+            background: "#28a745",
+            color: "white",
+            border: "none",
+            borderRadius: "6px",
+            padding: "8px 16px",
+            cursor: "pointer",
+            fontSize: "14px",
+            fontWeight: "600",
+          }}
+        >
+          ✅ Tümünü Onayla
+        </button>
+      </div>
+      {pendingProducts.length > 0 ? (
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ürün Adı</th>
+                <th>Satıcı</th>
+                <th>Fiyat</th>
+                <th>Kategori</th>
+                <th>Görsel</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pendingProducts.map((p) => (
+                <tr key={p.id} style={{ backgroundColor: "#fff9e6" }}>
+                  <td>{p.id}</td>
+                  <td>{p.name}</td>
+                  <td>
+                    <strong>{p.sellerName || "Bilinmiyor"}</strong>
+                  </td>
+                  <td>{p.price} ₺</td>
+                  <td>{p.categoryName}</td>
+                  <td>
+                    {p.imageUrl && (
+                      <img
+                        src={
+                          p.imageUrl.startsWith("http")
+                            ? p.imageUrl
+                            : `https://localhost:7258/${p.imageUrl}`
+                        }
+                        width="60"
+                        height="60"
+                      />
+                    )}
+                  </td>
+                  <td>
+                    <button
+                      onClick={async () => {
+                        if (window.confirm(`"${p.name}" ürününü onaylamak istediğinize emin misiniz?`)) {
+                          try {
+                            await axios.post(`${API_URL}/Product/${p.id}/approve`);
+                            alert(`✅ "${p.name}" onaylandı ve yayınlandı!`);
+                            loadPendingProducts();
+                            loadProducts();
+                          } catch (error) {
+                            alert("❌ Onaylama başarısız: " + (error.response?.data?.message || error.message));
+                          }
+                        }
+                      }}
+                      style={{
+                        background: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                        marginRight: "4px",
+                      }}
+                    >
+                      ✅ Onayla
+                    </button>
+                    <button
+                      onClick={async () => {
+                        const reason = window.prompt(`"${p.name}" ürününü reddetme sebebi (opsiyonel):`);
+                        if (reason !== null) {
+                          try {
+                            const reasonParam = reason ? `?reason=${encodeURIComponent(reason)}` : '';
+                            await axios.post(`${API_URL}/Product/${p.id}/reject${reasonParam}`);
+                            alert(`❌ "${p.name}" reddedildi ve silindi.`);
+                            loadPendingProducts();
+                            loadProducts();
+                          } catch (error) {
+                            alert("❌ Reddetme başarısız: " + (error.response?.data?.message || error.message));
+                          }
+                        }
+                      }}
+                      style={{
+                        background: "#dc3545",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "6px",
+                        padding: "6px 12px",
+                        cursor: "pointer",
+                      }}
+                    >
+                      ❌ Reddet
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <p style={{ padding: "20px", color: "#666", fontStyle: "italic" }}>
+          Şu anda onay bekleyen ürün yok.
+        </p>
+      )}
+
       {/* Ürün Listesi */}
-      <h2>📦 Ürünler</h2>
+      <h2>📦 Tüm Ürünler</h2>
       <table>
         <thead>
           <tr>
@@ -311,7 +461,11 @@ function AdminPanel() {
               <td>
                 {p.imageUrl && (
                   <img
-                    src={`https://localhost:7258/${p.imageUrl}`}
+                    src={
+                      p.imageUrl.startsWith("http")
+                        ? p.imageUrl
+                        : `https://localhost:7258/${p.imageUrl}`
+                    }
                     width="60"
                     height="60"
                   />

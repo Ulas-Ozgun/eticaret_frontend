@@ -44,7 +44,11 @@ function FavoritesPage() {
           {favorites.map((fav) => (
             <div key={fav.id} className="favorite-card">
               <img
-                src={fav.product.imageUrl}
+                src={
+                  fav.product.imageUrl?.startsWith("http")
+                    ? fav.product.imageUrl
+                    : `https://localhost:7258/${fav.product.imageUrl}`
+                }
                 alt={fav.product.name}
                 className="favorite-image"
               />

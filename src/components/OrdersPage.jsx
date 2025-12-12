@@ -40,9 +40,11 @@ function OrdersPage() {
             <div className="order-card" key={order.id}>
               <img
                 src={
-                  order.product.imageUrl
-                    ? `/${order.product.imageUrl}`
-                    : "/images/default.jpg"
+                  !order.product.imageUrl
+                    ? "https://via.placeholder.com/120"
+                    : order.product.imageUrl.startsWith("http")
+                    ? order.product.imageUrl
+                    : `https://localhost:7258/${order.product.imageUrl}`
                 }
                 alt={order.product.name}
                 className="order-image"
