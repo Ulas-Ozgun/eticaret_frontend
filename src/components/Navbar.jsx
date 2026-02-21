@@ -15,9 +15,23 @@ function Navbar({ setSearchTerm }) {
   const [categories, setCategories] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-  // 🔥 Sadece ana kategoriler çekiliyor
+  // Kategori isimlerini düzenle (görünüm için)
+  const getDisplayName = (categoryName) => {
+    if (categoryName === "Elektronik") {
+      return "Saat";
+    }
+    return categoryName;
+  };
+
+  // 🔥 Sadece ana kategoriler çekiliyor (Kitap hariç)
   useEffect(() => {
-    axios.get(`${API_URL}/Category`).then((res) => setCategories(res.data));
+    axios.get(`${API_URL}/Category`).then((res) => {
+      // Kitap kategorisini filtrele
+      const filtered = res.data.filter(cat => 
+        cat.name && cat.name.toLowerCase() !== "kitap"
+      );
+      setCategories(filtered);
+    });
   }, []);
 
   // Çıkış
@@ -64,7 +78,7 @@ function Navbar({ setSearchTerm }) {
                     setDropdownOpen(false);
                   }}
                 >
-                  {cat.name}
+                  {getDisplayName(cat.name)}
                 </div>
               ))}
             </div>
