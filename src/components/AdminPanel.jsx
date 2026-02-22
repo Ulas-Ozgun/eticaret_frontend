@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./AdminPanel.css";
+import Pagination from "./Pagination";
+import useHybridPagination from "../hooks/useHybridPagination";
 
 const API_URL = "https://localhost:7258/api";
 
 function AdminPanel() {
-  const [products, setProducts] = useState([]);
   const [pendingProducts, setPendingProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [editingId, setEditingId] = useState(null);
@@ -32,14 +33,34 @@ function AdminPanel() {
   const [selectedBedenler, setSelectedBedenler] = useState([]);
   const [selectedNumaralar, setSelectedNumaralar] = useState([]);
 
+  const [productSearch, setProductSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
   const role = localStorage.getItem("role");
 
-  // -----------------------------
-  // 🔥 İlk yüklemeler
-  // -----------------------------
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(productSearch), 400);
+    return () => clearTimeout(timer);
+  }, [productSearch]);
+
+  const {
+    products,
+    block,
+    totalBlocks,
+    totalCount,
+    hasMoreInBlock,
+    loading,
+    initialLoading,
+    sentinelRef,
+    goToBlock,
+    refresh: refreshProducts,
+  } = useHybridPagination({
+    includePending: true,
+    search: debouncedSearch || null,
+  });
+
   useEffect(() => {
     if (role === "Admin") {
-      loadProducts();
       loadPendingProducts();
       loadOrders();
       loadOptions();
@@ -53,58 +74,38 @@ function AdminPanel() {
       .then((res) => setSubCategories(res.data));
   }, []);
 
-  // Ürünleri getir (tüm ürünler - onaylanmış ve bekleyen)
-  const loadProducts = async () => {
-    const res = await axios.get(`${API_URL}/Product?includePending=true`);
-    setProducts(res.data);
-  };
-
-  // Bekleyen ürünleri getir
   const loadPendingProducts = async () => {
     try {
       const res = await axios.get(`${API_URL}/Product/pending`);
-      console.log("Bekleyen ürünler:", res.data);
       setPendingProducts(res.data || []);
     } catch (error) {
       console.error("Bekleyen ürünler yüklenemedi:", error);
-      console.error("Hata detayı:", error.response?.data);
       setPendingProducts([]);
     }
   };
 
-  // Siparişleri getir
   const loadOrders = async () => {
     const res = await axios.get(`${API_URL}/Order/all`);
     setOrders(res.data);
   };
 
-  // Beden ve numaraları getir
   const loadOptions = async () => {
     const [bedenRes, numaraRes] = await Promise.all([
       axios.get(`${API_URL}/Beden`),
       axios.get(`${API_URL}/Numara`),
     ]);
-
     setBedenler(bedenRes.data);
     setNumaralar(numaraRes.data);
   };
 
-  // --------------------------------
-  // 🔥 Kategori değişince alt kategori filtrele
-  // --------------------------------
   const handleCategoryChange = (e) => {
     const value = e.target.value;
-
     setNewProduct({ ...newProduct, categoryId: value });
     const subs = subCategories.filter((sc) => sc.categoryId === Number(value));
     setFilteredSubs(subs);
-
-    setSelectedSubCategory(""); // reset
+    setSelectedSubCategory("");
   };
 
-  // --------------------------------
-  // 🔥 Ürün ekle / güncelle
-  // --------------------------------
   const handleAddOrUpdate = async (e) => {
     e.preventDefault();
 
@@ -127,24 +128,19 @@ function AdminPanel() {
       await axios.put(`${API_URL}/Product/${editingId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       alert("✏️ Ürün güncellendi");
       setEditingId(null);
     } else {
       await axios.post(`${API_URL}/Product/add-with-image`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       alert("✅ Ürün eklendi");
     }
 
     resetForm();
-    loadProducts();
+    refreshProducts();
   };
 
-  // --------------------------------
-  // 🔧 Düzenleme moduna alma
-  // --------------------------------
   const handleEdit = (product) => {
     setEditingId(product.id);
 
@@ -163,7 +159,6 @@ function AdminPanel() {
         : `https://localhost:7258/${product.imageUrl}`
     );
 
-    // 🔥 Alt kategori otomatik gelsin
     const subs = subCategories.filter(
       (sc) => sc.categoryId === product.categoryId
     );
@@ -173,9 +168,6 @@ function AdminPanel() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // --------------------------------
-  // 🧹 Form sıfırlama
-  // --------------------------------
   const resetForm = () => {
     setNewProduct({
       name: "",
@@ -185,7 +177,6 @@ function AdminPanel() {
       stock: 0,
       status: "Aktif",
     });
-
     setImageFile(null);
     setPreviewUrl(null);
     setSelectedBedenler([]);
@@ -193,19 +184,12 @@ function AdminPanel() {
     setSelectedSubCategory("");
   };
 
-  // --------------------------------
-  // 🗑 Ürün silme
-  // --------------------------------
   const handleDelete = async (id) => {
     if (!window.confirm("Silmek istediğine emin misin?")) return;
-
     await axios.delete(`${API_URL}/Product/${id}`);
-    loadProducts();
+    refreshProducts();
   };
 
-  // --------------------------------
-  // 🖼 Resim seçme
-  // --------------------------------
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     setImageFile(file);
@@ -238,7 +222,6 @@ function AdminPanel() {
             setNewProduct({ ...newProduct, description: e.target.value })
           }
         />
-
         <input
           placeholder="Fiyat"
           type="number"
@@ -247,7 +230,6 @@ function AdminPanel() {
             setNewProduct({ ...newProduct, price: e.target.value })
           }
         />
-
         <input
           placeholder="Stok"
           type="number"
@@ -257,7 +239,6 @@ function AdminPanel() {
           }
         />
 
-        {/* Kategori */}
         <label>Kategori</label>
         <select value={newProduct.categoryId} onChange={handleCategoryChange}>
           <option value="">Seçiniz</option>
@@ -268,7 +249,6 @@ function AdminPanel() {
           ))}
         </select>
 
-        {/* Alt Kategori */}
         <label>Alt Kategori</label>
         <select
           value={selectedSubCategory}
@@ -282,9 +262,7 @@ function AdminPanel() {
           ))}
         </select>
 
-        {/* Görsel */}
         <input type="file" accept="image/*" onChange={handleImageChange} />
-
         {previewUrl && (
           <img src={previewUrl} width="120" style={{ borderRadius: 8 }} />
         )}
@@ -292,7 +270,6 @@ function AdminPanel() {
         <button type="submit">
           {editingId ? "💾 Güncelle" : "➕ Ürün Ekle"}
         </button>
-
         {editingId && (
           <button onClick={resetForm} type="button">
             ❌ İptal
@@ -300,7 +277,7 @@ function AdminPanel() {
         )}
       </form>
 
-      {/* Bekleyen Ürünler (Onay Bekleyen) */}
+      {/* Bekleyen Ürünler */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
         <h2>⏳ Onay Bekleyen Ürünler {pendingProducts.length > 0 && `(${pendingProducts.length})`}</h2>
         <button
@@ -310,7 +287,7 @@ function AdminPanel() {
                 const res = await axios.post(`${API_URL}/Product/approve-all`);
                 alert(res.data.message || "✅ Tüm ürünler onaylandı!");
                 loadPendingProducts();
-                loadProducts();
+                refreshProducts();
               } catch (error) {
                 alert("❌ Hata: " + (error.response?.data?.message || error.message));
               }
@@ -331,29 +308,168 @@ function AdminPanel() {
         </button>
       </div>
       {pendingProducts.length > 0 ? (
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Ürün Adı</th>
+              <th>Satıcı</th>
+              <th>Fiyat</th>
+              <th>Kategori</th>
+              <th>Görsel</th>
+              <th>İşlemler</th>
+            </tr>
+          </thead>
+          <tbody>
+            {pendingProducts.map((p) => (
+              <tr key={p.id} style={{ backgroundColor: "#fff9e6" }}>
+                <td>{p.id}</td>
+                <td>{p.name}</td>
+                <td>
+                  <strong>{p.sellerName || "Bilinmiyor"}</strong>
+                </td>
+                <td>{p.price} ₺</td>
+                <td>{p.categoryName}</td>
+                <td>
+                  {p.imageUrl && (
+                    <img
+                      src={
+                        p.imageUrl.startsWith("http")
+                          ? p.imageUrl
+                          : `https://localhost:7258/${p.imageUrl}`
+                      }
+                      width="60"
+                      height="60"
+                    />
+                  )}
+                </td>
+                <td>
+                  <button
+                    onClick={async () => {
+                      if (window.confirm(`"${p.name}" ürününü onaylamak istediğinize emin misiniz?`)) {
+                        try {
+                          await axios.post(`${API_URL}/Product/${p.id}/approve`);
+                          alert(`✅ "${p.name}" onaylandı ve yayınlandı!`);
+                          loadPendingProducts();
+                          refreshProducts();
+                        } catch (error) {
+                          alert("❌ Onaylama başarısız: " + (error.response?.data?.message || error.message));
+                        }
+                      }
+                    }}
+                    style={{
+                      background: "#28a745",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "6px 12px",
+                      cursor: "pointer",
+                      marginRight: "4px",
+                    }}
+                  >
+                    ✅ Onayla
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const reason = window.prompt(`"${p.name}" ürününü reddetme sebebi (opsiyonel):`);
+                      if (reason !== null) {
+                        try {
+                          const reasonParam = reason ? `?reason=${encodeURIComponent(reason)}` : '';
+                          await axios.post(`${API_URL}/Product/${p.id}/reject${reasonParam}`);
+                          alert(`❌ "${p.name}" reddedildi ve silindi.`);
+                          loadPendingProducts();
+                          refreshProducts();
+                        } catch (error) {
+                          alert("❌ Reddetme başarısız: " + (error.response?.data?.message || error.message));
+                        }
+                      }
+                    }}
+                    style={{
+                      background: "#dc3545",
+                      color: "white",
+                      border: "none",
+                      borderRadius: "6px",
+                      padding: "6px 12px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ❌ Reddet
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p style={{ padding: "20px", color: "#666", fontStyle: "italic" }}>
+          Şu anda onay bekleyen ürün yok.
+        </p>
+      )}
+
+      {/* Ürün Listesi — Hybrid Pagination */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "30px", flexWrap: "wrap", gap: "12px" }}>
+        <h2 style={{ margin: 0 }}>📦 Tüm Ürünler</h2>
+        <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+          <div className="panel-search-wrapper">
+            <span className="panel-search-icon">🔍</span>
+            <input
+              type="text"
+              placeholder="Ürün ara..."
+              value={productSearch}
+              onChange={(e) => setProductSearch(e.target.value)}
+              className="panel-search-input"
+            />
+            {productSearch && (
+              <button
+                className="panel-search-clear"
+                onClick={() => setProductSearch("")}
+              >
+                ✕
+              </button>
+            )}
+          </div>
+          {totalCount > 0 && (
+            <span style={{ color: "#666", fontSize: "14px", whiteSpace: "nowrap" }}>
+              <strong style={{ color: "#ff6600" }}>{totalCount}</strong> ürün
+              {totalBlocks > 1 && <> — Sayfa <strong>{block}</strong> / {totalBlocks}</>}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {initialLoading ? (
+        <div className="loading-container">
+          <div className="loading-spinner" />
+          <p>Ürünler yükleniyor...</p>
+        </div>
+      ) : products.length === 0 ? (
+        <p style={{ padding: "20px", color: "#888" }}>Henüz ürün yok.</p>
+      ) : (
         <>
           <table>
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Ürün Adı</th>
-                <th>Satıcı</th>
+                <th>Ad</th>
                 <th>Fiyat</th>
+                <th>Stok</th>
+                <th>Durum</th>
                 <th>Kategori</th>
+                <th>Alt Kategori</th>
                 <th>Görsel</th>
                 <th>İşlemler</th>
               </tr>
             </thead>
             <tbody>
-              {pendingProducts.map((p) => (
-                <tr key={p.id} style={{ backgroundColor: "#fff9e6" }}>
+              {products.map((p) => (
+                <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>{p.name}</td>
-                  <td>
-                    <strong>{p.sellerName || "Bilinmiyor"}</strong>
-                  </td>
                   <td>{p.price} ₺</td>
-                  <td>{p.categoryName}</td>
+                  <td>{p.stock}</td>
+                  <td>{p.status}</td>
+                  <td>{p.categoryName || "-"}</td>
+                  <td>{p.subCategoryName || "-"}</td>
                   <td>
                     {p.imageUrl && (
                       <img
@@ -368,124 +484,41 @@ function AdminPanel() {
                     )}
                   </td>
                   <td>
-                    <button
-                      onClick={async () => {
-                        if (window.confirm(`"${p.name}" ürününü onaylamak istediğinize emin misiniz?`)) {
-                          try {
-                            await axios.post(`${API_URL}/Product/${p.id}/approve`);
-                            alert(`✅ "${p.name}" onaylandı ve yayınlandı!`);
-                            loadPendingProducts();
-                            loadProducts();
-                          } catch (error) {
-                            alert("❌ Onaylama başarısız: " + (error.response?.data?.message || error.message));
-                          }
-                        }
-                      }}
-                      style={{
-                        background: "#28a745",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        padding: "6px 12px",
-                        cursor: "pointer",
-                        marginRight: "4px",
-                      }}
-                    >
-                      ✅ Onayla
+                    <button onClick={() => handleEdit(p)} className="btn-edit">
+                      ✏️
                     </button>
                     <button
-                      onClick={async () => {
-                        const reason = window.prompt(`"${p.name}" ürününü reddetme sebebi (opsiyonel):`);
-                        if (reason !== null) {
-                          try {
-                            const reasonParam = reason ? `?reason=${encodeURIComponent(reason)}` : '';
-                            await axios.post(`${API_URL}/Product/${p.id}/reject${reasonParam}`);
-                            alert(`❌ "${p.name}" reddedildi ve silindi.`);
-                            loadPendingProducts();
-                            loadProducts();
-                          } catch (error) {
-                            alert("❌ Reddetme başarısız: " + (error.response?.data?.message || error.message));
-                          }
-                        }
-                      }}
-                      style={{
-                        background: "#dc3545",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "6px",
-                        padding: "6px 12px",
-                        cursor: "pointer",
-                      }}
+                      onClick={() => handleDelete(p.id)}
+                      className="btn-delete"
                     >
-                      ❌ Reddet
+                      🗑️
                     </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+
+          {hasMoreInBlock && (
+            <div ref={sentinelRef} className="scroll-sentinel">
+              {loading && (
+                <div className="loading-more">
+                  <div className="loading-spinner small" />
+                  <span>Daha fazla ürün yükleniyor...</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!hasMoreInBlock && totalBlocks > 1 && (
+            <Pagination
+              currentBlock={block}
+              totalBlocks={totalBlocks}
+              onBlockChange={goToBlock}
+            />
+          )}
         </>
-      ) : (
-        <p style={{ padding: "20px", color: "#666", fontStyle: "italic" }}>
-          Şu anda onay bekleyen ürün yok.
-        </p>
       )}
-
-      {/* Ürün Listesi */}
-      <h2>📦 Tüm Ürünler</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Ad</th>
-            <th>Fiyat</th>
-            <th>Stok</th>
-            <th>Durum</th>
-            <th>Kategori</th>
-            <th>Alt Kategori</th>
-            <th>Görsel</th>
-            <th>İşlemler</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {products.map((p) => (
-            <tr key={p.id}>
-              <td>{p.id}</td>
-              <td>{p.name}</td>
-              <td>{p.price} ₺</td>
-              <td>{p.stock}</td>
-              <td>{p.status}</td>
-              <td>{p.category?.name}</td>
-              <td>{p.subCategory?.name || "-"}</td> {/* 🔥 ALT KATEGORİ */}
-              <td>
-                {p.imageUrl && (
-                  <img
-                    src={
-                      p.imageUrl.startsWith("http")
-                        ? p.imageUrl
-                        : `https://localhost:7258/${p.imageUrl}`
-                    }
-                    width="60"
-                    height="60"
-                  />
-                )}
-              </td>
-              <td>
-                <button onClick={() => handleEdit(p)} className="btn-edit">
-                  ✏️
-                </button>
-                <button
-                  onClick={() => handleDelete(p.id)}
-                  className="btn-delete"
-                >
-                  🗑️
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
 
       {/* Siparişler */}
       <h2>📜 Siparişler</h2>

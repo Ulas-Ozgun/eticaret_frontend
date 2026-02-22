@@ -1347,3 +1347,205 @@
   text-overflow: ellipsis;
   display: block;
 }
+
+/* ========================================
+   TOOLBAR (ADET + SIRALAMA)
+   ======================================== */
+.list-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 4px 8px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sort-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sort-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+
+.sort-select {
+  padding: 9px 14px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  background: #fff;
+  cursor: pointer;
+  outline: none;
+  transition: border-color 0.25s, box-shadow 0.25s;
+  min-width: 200px;
+}
+
+.sort-select:focus {
+  border-color: #ff6600;
+  box-shadow: 0 0 0 3px rgba(255, 102, 0, 0.12);
+}
+
+.sort-select:hover {
+  border-color: #ffaa66;
+}
+
+/* ========================================
+   KAMPANYALI ÜRÜNLER SLIDER
+   ======================================== */
+.discount-section {
+  padding: 30px 50px 10px;
+  background: linear-gradient(180deg, #fff5ec 0%, #faf1e6 100%);
+}
+
+.discount-section-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #e63900;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.discount-slider {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 8px 4px 24px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #ffb088 transparent;
+}
+
+.discount-slider::-webkit-scrollbar {
+  height: 6px;
+}
+
+.discount-slider::-webkit-scrollbar-thumb {
+  background: #ffb088;
+  border-radius: 10px;
+}
+
+.discount-card {
+  position: relative;
+  min-width: 200px;
+  max-width: 200px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 3px 14px rgba(230, 57, 0, 0.1);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.discount-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 28px rgba(230, 57, 0, 0.2);
+  border-color: #e63900;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #e63900, #ff5722);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 8px;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(230, 57, 0, 0.35);
+}
+
+.discount-img-wrapper {
+  width: 100%;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.discount-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+}
+
+.discount-info {
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.discount-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.discount-prices {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.discount-old-price {
+  font-size: 14px;
+  color: #999;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.discount-new-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: #e63900;
+}
+
+/* ========================================
+   ÜRÜN KARTLARINDA İNDİRİM ETİKETİ + ESKİ FİYAT
+   ======================================== */
+.product-discount-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: linear-gradient(135deg, #e63900, #ff5722);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 8px;
+  z-index: 5;
+  box-shadow: 0 2px 8px rgba(230, 57, 0, 0.3);
+}
+
+.price-area {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.old-price {
+  font-size: 13px;
+  color: #999;
+  text-decoration: line-through;
+  font-weight: 500;
+  line-height: 1;
+}

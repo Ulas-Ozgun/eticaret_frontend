@@ -751,3 +751,96 @@
   color: #c0392b;
   text-decoration: underline;
 }
+
+/* ========================================
+   ÖNERİLEN ÜRÜNLER
+   ======================================== */
+.related-section {
+  width: 100%;
+  margin-top: 40px;
+  padding: 30px 0;
+}
+
+.related-section h3 {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ff6600;
+  margin-bottom: 20px;
+}
+
+.related-slider {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding: 10px 4px 20px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #ffc899 transparent;
+}
+
+.related-slider::-webkit-scrollbar {
+  height: 6px;
+}
+
+.related-slider::-webkit-scrollbar-thumb {
+  background: #ffc899;
+  border-radius: 10px;
+}
+
+.related-card {
+  min-width: 180px;
+  max-width: 180px;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.related-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 8px 24px rgba(255, 102, 0, 0.18);
+  border-color: #ff6600;
+}
+
+.related-img-wrapper {
+  width: 100%;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fafafa;
+  overflow: hidden;
+}
+
+.related-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 10px;
+}
+
+.related-info {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.related-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.related-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ff6600;
+}

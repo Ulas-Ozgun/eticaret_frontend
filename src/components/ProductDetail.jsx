@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./ProductDetail.css";
 
@@ -7,6 +7,7 @@ const API_URL = "https://localhost:7258/api";
 
 function ProductDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
 
@@ -21,6 +22,8 @@ function ProductDetail() {
   const [newComment, setNewComment] = useState("");
   const [rating, setRating] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
+
+  const [relatedProducts, setRelatedProducts] = useState([]);
 
   // 🔥 1) Son bakılan ürün tablosuna kayıt
   useEffect(() => {
@@ -56,6 +59,20 @@ function ProductDetail() {
     };
 
     if (id) fetchProduct();
+  }, [id]);
+
+  // 🔹 Önerilen ürünleri getir (aynı kategori)
+  useEffect(() => {
+    if (!id) return;
+    const fetchRelated = async () => {
+      try {
+        const res = await axios.get(`${API_URL}/Product/${id}/related?limit=10`);
+        setRelatedProducts(res.data || []);
+      } catch {
+        setRelatedProducts([]);
+      }
+    };
+    fetchRelated();
   }, [id]);
 
   // 🔹 3) Ürüne ait yorumları getir
@@ -328,6 +345,38 @@ function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {/* 🔹 ÖNERİLEN ÜRÜNLER */}
+      {relatedProducts.length > 0 && (
+        <div className="related-section">
+          <h3>✨ Önerilen Ürünler</h3>
+          <div className="related-slider">
+            {relatedProducts.map((rp) => (
+              <div
+                key={rp.id}
+                className="related-card"
+                onClick={() => navigate(`/product/${rp.id}`)}
+              >
+                <div className="related-img-wrapper">
+                  <img
+                    src={
+                      rp.imageUrl?.startsWith("http")
+                        ? rp.imageUrl
+                        : `https://localhost:7258/${rp.imageUrl}`
+                    }
+                    alt={rp.name}
+                    loading="lazy"
+                  />
+                </div>
+                <div className="related-info">
+                  <span className="related-name">{rp.name}</span>
+                  <span className="related-price">{rp.price} ₺</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 🔹 ALTTA YORUM BÖLÜMÜ */}
       <div className="reviews-section">

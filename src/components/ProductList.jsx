@@ -3,6 +3,8 @@ import axios from "axios";
 import "./ProductList.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import HomeSlider from "./HomeSlider";
+import Pagination from "./Pagination";
+import useHybridPagination from "../hooks/useHybridPagination";
 
 const API_URL = "https://localhost:7258/api";
 
@@ -11,47 +13,53 @@ function ProductList({ searchTerm }) {
   const navigate = useNavigate();
 
   const userId = localStorage.getItem("userId");
-
-  const [products, setProducts] = useState([]);
   const [recentViews, setRecentViews] = useState([]);
+  const [discountedProducts, setDiscountedProducts] = useState([]);
+  const [sortBy, setSortBy] = useState("newest");
 
   const params = new URLSearchParams(location.search);
   const catId = params.get("catId");
 
-  // Ürünleri yükle
-  const loadProducts = async () => {
+  const {
+    products,
+    block,
+    totalBlocks,
+    totalCount,
+    hasMoreInBlock,
+    loading,
+    initialLoading,
+    sentinelRef,
+    goToBlock,
+  } = useHybridPagination({
+    categoryId: catId ? Number(catId) : null,
+    search: searchTerm || null,
+    sortBy,
+  });
+
+  const loadRecentViews = async () => {
+    if (!userId) return;
     try {
-      const res = await axios.get(`${API_URL}/Product`);
-      console.log("API'den gelen ürünler:", res.data?.length, "adet");
-      setProducts(res.data || []);
-    } catch (error) {
-      console.error("Ürünler yüklenirken hata:", error);
-      setProducts([]);
+      const res = await axios.get(`${API_URL}/RecentViews/${userId}`);
+      setRecentViews(res.data);
+    } catch {
+      setRecentViews([]);
     }
   };
 
-  // Son bakılan ürünleri yükle
-  const loadRecentViews = async () => {
-    if (!userId) return;
-    const res = await axios.get(`${API_URL}/RecentViews/${userId}`);
-    setRecentViews(res.data);
+  const loadDiscountedProducts = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/Product/discounted?limit=20`);
+      setDiscountedProducts(res.data || []);
+    } catch {
+      setDiscountedProducts([]);
+    }
   };
 
-  // 🔥 TEK useEffect → hem ürünleri hem recentleri yükler
   useEffect(() => {
-    loadProducts();
     loadRecentViews();
-  }, [location]);
+    loadDiscountedProducts();
+  }, [userId]);
 
-  const filteredProducts = products.filter((p) => {
-    const matchesSearch = p.name
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase());
-    const matchesCategory = catId ? p.categoryId === Number(catId) : true;
-    return matchesSearch && matchesCategory;
-  });
-
-  // Sepet işlemi
   const addToCart = async (productId) => {
     if (!userId) return alert("Lütfen giriş yapın!");
     await axios.post(`${API_URL}/Cart`, {
@@ -62,7 +70,6 @@ function ProductList({ searchTerm }) {
     alert("Sepete eklendi!");
   };
 
-  // Favori işlemi
   const addToFavorites = async (productId) => {
     if (!userId) return alert("Favori için giriş yapmalısınız!");
     await axios.post(`${API_URL}/Favorite`, {
@@ -76,7 +83,6 @@ function ProductList({ searchTerm }) {
     <>
       <HomeSlider />
 
-      {/* 🔥 SON BAKILANLAR */}
       {recentViews.length > 0 && (
         <>
           <h2 className="recent-title">🔍 Son Görüntülenenler</h2>
@@ -102,69 +108,170 @@ function ProductList({ searchTerm }) {
         </>
       )}
 
-      {/* 🔥 ÜRÜNLER */}
-      <div className="product-list-container">
-        <div className="product-grid">
-          {filteredProducts.length === 0 ? (
-            <p>Ürün bulunamadı 😢</p>
-          ) : (
-            filteredProducts.map((product) => (
-              <div key={product.id} className="product-card">
-                <button
-                  className="fav-icon"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToFavorites(product.id);
-                  }}
-                >
-                  ❤️
-                </button>
-
-                <div
-                  className="product-img-wrapper"
-                  onClick={() => navigate(`/product/${product.id}`)}
-                >
+      {/* KAMPANYALI ÜRÜNLER */}
+      {discountedProducts.length > 0 && (
+        <div className="discount-section">
+          <h2 className="discount-section-title">🔥 Kampanyalı Ürünler</h2>
+          <div className="discount-slider">
+            {discountedProducts.map((dp) => (
+              <div
+                key={dp.id}
+                className="discount-card"
+                onClick={() => navigate(`/product/${dp.id}`)}
+              >
+                <div className="discount-badge">%{dp.discountPercent}</div>
+                <div className="discount-img-wrapper">
                   <img
                     src={
-                      product.imageUrl?.startsWith("http")
-                        ? product.imageUrl
-                        : `https://localhost:7258/${product.imageUrl}`
+                      dp.imageUrl?.startsWith("http")
+                        ? dp.imageUrl
+                        : `https://localhost:7258/${dp.imageUrl}`
                     }
-                    alt={product.name}
-                    className="product-image"
+                    alt={dp.name}
+                    loading="lazy"
                   />
                 </div>
-
-                <div className="product-info">
-                  <h3>{product.name}</h3>
-                  <p>{product.description}</p>
-
-                  <div className="product-bottom">
-                    <span className="price">{product.price} ₺</span>
-
-                    <button
-                      className="add-btn"
-                      onClick={() => addToCart(product.id)}
-                      disabled={product.stock <= 0}
-                    >
-                      🛒 Sepete Ekle
-                    </button>
-                  </div>
-
-                  <div className="stock-status">
-                    {product.stock > 0 ? (
-                      <span className="in-stock">
-                        🟢 {product.stock} adet var
-                      </span>
-                    ) : (
-                      <span className="out-stock">🔴 Tükendi</span>
-                    )}
+                <div className="discount-info">
+                  <span className="discount-name">{dp.name}</span>
+                  <div className="discount-prices">
+                    <span className="discount-old-price">{dp.oldPrice} ₺</span>
+                    <span className="discount-new-price">{dp.price} ₺</span>
                   </div>
                 </div>
               </div>
-            ))
-          )}
+            ))}
+          </div>
         </div>
+      )}
+
+      <div className="product-list-container">
+        <div className="list-toolbar">
+          {totalCount > 0 && (
+            <div className="product-count-info">
+              Toplam <strong>{totalCount}</strong> ürün bulundu
+              {totalBlocks > 1 && (
+                <span>
+                  {" "}
+                  — Sayfa <strong>{block}</strong> / {totalBlocks}
+                </span>
+              )}
+            </div>
+          )}
+          <div className="sort-wrapper">
+            <label className="sort-label">Sırala:</label>
+            <select
+              className="sort-select"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="newest">En Yeniler</option>
+              <option value="price_asc">Fiyat: Düşükten Yükseğe</option>
+              <option value="price_desc">Fiyat: Yüksekten Düşüğe</option>
+              <option value="most_reviewed">En Çok Yorum Alan</option>
+              <option value="top_rated">En Yüksek Puan</option>
+            </select>
+          </div>
+        </div>
+
+        {initialLoading ? (
+          <div className="loading-container">
+            <div className="loading-spinner" />
+            <p>Ürünler yükleniyor...</p>
+          </div>
+        ) : products.length === 0 ? (
+          <p className="empty-text">Ürün bulunamadı 😢</p>
+        ) : (
+          <>
+            <div className="product-grid">
+              {products.map((product) => (
+                <div key={product.id} className="product-card">
+                  {product.oldPrice && product.oldPrice > product.price && (
+                    <div className="product-discount-tag">
+                      %{Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}
+                    </div>
+                  )}
+
+                  <button
+                    className="fav-icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToFavorites(product.id);
+                    }}
+                  >
+                    ❤️
+                  </button>
+
+                  <div
+                    className="product-img-wrapper"
+                    onClick={() => navigate(`/product/${product.id}`)}
+                  >
+                    <img
+                      src={
+                        product.imageUrl?.startsWith("http")
+                          ? product.imageUrl
+                          : `https://localhost:7258/${product.imageUrl}`
+                      }
+                      alt={product.name}
+                      className="product-image"
+                      loading="lazy"
+                    />
+                  </div>
+
+                  <div className="product-info">
+                    <h3>{product.name}</h3>
+                    <p>{product.description}</p>
+
+                    <div className="product-bottom">
+                      <div className="price-area">
+                        {product.oldPrice && product.oldPrice > product.price && (
+                          <span className="old-price">{product.oldPrice} ₺</span>
+                        )}
+                        <span className="price">{product.price} ₺</span>
+                      </div>
+
+                      <button
+                        className="add-btn"
+                        onClick={() => addToCart(product.id)}
+                        disabled={product.stock <= 0}
+                      >
+                        🛒 Sepete Ekle
+                      </button>
+                    </div>
+
+                    <div className="stock-status">
+                      {product.stock > 0 ? (
+                        <span className="in-stock">
+                          🟢 {product.stock} adet var
+                        </span>
+                      ) : (
+                        <span className="out-stock">🔴 Tükendi</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {hasMoreInBlock && (
+              <div ref={sentinelRef} className="scroll-sentinel">
+                {loading && (
+                  <div className="loading-more">
+                    <div className="loading-spinner small" />
+                    <span>Daha fazla ürün yükleniyor...</span>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {!hasMoreInBlock && totalBlocks > 1 && (
+              <Pagination
+                currentBlock={block}
+                totalBlocks={totalBlocks}
+                onBlockChange={goToBlock}
+              />
+            )}
+          </>
+        )}
       </div>
     </>
   );
