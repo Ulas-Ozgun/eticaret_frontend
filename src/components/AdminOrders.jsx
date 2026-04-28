@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./AdminOrders.css";
-
-const API_URL = "https://localhost:7258/api"; // kendi backend adresine göre ayarla
+import { API_URL } from "../config/api.js";
 
 function AdminOrders() {
   const [orders, setOrders] = useState([]);

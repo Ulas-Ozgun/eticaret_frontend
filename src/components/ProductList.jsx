@@ -5,8 +5,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import HomeSlider from "./HomeSlider";
 import Pagination from "./Pagination";
 import useHybridPagination from "../hooks/useHybridPagination";
-
-const API_URL = "https://localhost:7258/api";
+import { API_URL, assetUrl } from "../config/api.js";
 
 function ProductList({ searchTerm }) {
   const location = useLocation();
@@ -34,6 +33,7 @@ function ProductList({ searchTerm }) {
     categoryId: catId ? Number(catId) : null,
     search: searchTerm || null,
     sortBy,
+    excludeDiscounted: true,
   });
 
   const loadRecentViews = async () => {
@@ -93,14 +93,7 @@ function ProductList({ searchTerm }) {
                 className="recent-item"
                 onClick={() => navigate(`/product/${rv.productId}`)}
               >
-                <img
-                  src={
-                    rv.imageUrl?.startsWith("http")
-                      ? rv.imageUrl
-                      : `https://localhost:7258/${rv.imageUrl}`
-                  }
-                  alt={rv.productName}
-                />
+                <img src={assetUrl(rv.imageUrl)} alt={rv.productName} />
                 <div className="recent-title">{rv.productName}</div>
               </div>
             ))}
@@ -122,11 +115,7 @@ function ProductList({ searchTerm }) {
                 <div className="discount-badge">%{dp.discountPercent}</div>
                 <div className="discount-img-wrapper">
                   <img
-                    src={
-                      dp.imageUrl?.startsWith("http")
-                        ? dp.imageUrl
-                        : `https://localhost:7258/${dp.imageUrl}`
-                    }
+                    src={assetUrl(dp.imageUrl)}
                     alt={dp.name}
                     loading="lazy"
                   />
@@ -206,11 +195,7 @@ function ProductList({ searchTerm }) {
                     onClick={() => navigate(`/product/${product.id}`)}
                   >
                     <img
-                      src={
-                        product.imageUrl?.startsWith("http")
-                          ? product.imageUrl
-                          : `https://localhost:7258/${product.imageUrl}`
-                      }
+                      src={assetUrl(product.imageUrl)}
                       alt={product.name}
                       className="product-image"
                       loading="lazy"

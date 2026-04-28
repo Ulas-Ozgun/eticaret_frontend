@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
-
-const API_URL = "https://localhost:7258/api";
+import { API_URL } from "../config/api.js";
 
 export default function useHybridPagination({
   categoryId,
@@ -9,6 +8,7 @@ export default function useHybridPagination({
   includePending = false,
   sellerId = null,
   sortBy = null,
+  excludeDiscounted = false,
 }) {
   const [products, setProducts] = useState([]);
   const [block, setBlock] = useState(1);
@@ -43,6 +43,7 @@ export default function useHybridPagination({
         if (includePending) params.includePending = true;
         if (sellerId) params.sellerId = sellerId;
         if (sortBy) params.sortBy = sortBy;
+        if (excludeDiscounted) params.excludeDiscounted = true;
 
         const res = await axios.get(`${API_URL}/Product/paginated`, {
           params,
@@ -66,7 +67,7 @@ export default function useHybridPagination({
         setInitialLoading(false);
       }
     },
-    [categoryId, search, includePending, sellerId, sortBy]
+    [categoryId, search, includePending, sellerId, sortBy, excludeDiscounted]
   );
 
   useEffect(() => {
@@ -75,7 +76,7 @@ export default function useHybridPagination({
     setPage(1);
     setInitialLoading(true);
     fetchProducts(1, 1, false);
-  }, [categoryId, search, includePending, sellerId, sortBy, fetchProducts]);
+  }, [categoryId, search, includePending, sellerId, sortBy, excludeDiscounted, fetchProducts]);
 
   const loadMoreInBlock = useCallback(() => {
     if (loading || !hasMoreInBlock) return;

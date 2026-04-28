@@ -1,14 +1,15 @@
 import axios from "axios";
-const API_URL = "https://localhost:7258/api/Product";
-// kendi portunu yaz
+import { API_URL } from "../config/api.js";
+
+const PRODUCT_API_URL = `${API_URL}/Product`;
 
 export const getProducts = async () => {
-  const response = await axios.get(API_URL);
+  const response = await axios.get(PRODUCT_API_URL);
   return response.data;
 };
 
 export const addProduct = async (product) => {
-  const response = await axios.post(API_URL, product);
+  const response = await axios.post(PRODUCT_API_URL, product);
   return response.data;
 };
-console.log("API URL:", API_URL);
+console.log("API URL:", PRODUCT_API_URL);

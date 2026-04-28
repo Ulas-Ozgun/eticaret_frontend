@@ -4,7 +4,7 @@ import "./AdminPanel.css";
 import Pagination from "./Pagination";
 import useHybridPagination from "../hooks/useHybridPagination";
 
-const API_URL = "https://localhost:7258/api";
+import { API_URL, assetUrl } from "../config/api.js";
 
 function SellerPanel() {
   const [orders, setOrders] = useState([]);
@@ -485,15 +485,7 @@ function SellerPanel() {
                   <td>{p.subCategoryName || "-"}</td>
                   <td>
                     {p.imageUrl && (
-                      <img
-                        src={
-                          p.imageUrl.startsWith("http")
-                            ? p.imageUrl
-                            : `https://localhost:7258/${p.imageUrl}`
-                        }
-                        width="60"
-                        height="60"
-                      />
+                      <img src={assetUrl(p.imageUrl)} width="60" height="60" />
                     )}
                   </td>
                   <td>

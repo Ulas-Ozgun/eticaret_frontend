@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Navbar.css";
 
-const API_URL = "https://localhost:7258/api";
+import { API_URL } from "../config/api.js";
 
 function Navbar({ setSearchTerm }) {
   const navigate = useNavigate();

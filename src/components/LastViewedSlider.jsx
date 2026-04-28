@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./LastViewedSlider.css";
-
-const API_URL = "https://localhost:7258/api";
+import { API_URL, assetUrl } from "../config/api.js";
 
 function LastViewedSlider() {
   const [items, setItems] = useState([]);
@@ -29,9 +28,7 @@ function LastViewedSlider() {
               src={
                 !p.imageUrl
                   ? "https://via.placeholder.com/150"
-                  : p.imageUrl.startsWith("http")
-                  ? p.imageUrl
-                  : `https://localhost:7258/${p.imageUrl}`
+                  : assetUrl(p.imageUrl)
               }
               alt={p.name}
             />

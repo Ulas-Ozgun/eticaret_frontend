@@ -1,6 +1,7 @@
 import axios from "axios";
+import { API_URL } from "../config/api.js";
 
-const API_URL = "https://localhost:7258/api/cart"; // 🔹 Büyük/küçük harf önemli
+const CART_POST_URL = `${API_URL}/Cart`;
 
 export const addToCart = async (userId, productId, quantity) => {
   try {
@@ -12,7 +13,7 @@ export const addToCart = async (userId, productId, quantity) => {
 
     console.log("🟢 Gönderilen payload:", payload);
 
-    const response = await axios.post(API_URL, payload);
+    const response = await axios.post(CART_POST_URL, payload);
     console.log("✅ Backend yanıtı:", response.data);
     return response.data;
   } catch (error) {

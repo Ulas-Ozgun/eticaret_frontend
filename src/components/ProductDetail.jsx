@@ -1,9 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_URL, assetUrl } from "../config/api.js";
 import "./ProductDetail.css";
 
-const API_URL = "https://localhost:7258/api";
+function pickAiSummary(data) {
+  if (!data || typeof data !== "object") return "";
+  const raw = data.aiSummary ?? data.AiSummary;
+  return typeof raw === "string" ? raw.trim() : "";
+}
 
 function ProductDetail() {
   const { id } = useParams();
@@ -24,6 +29,11 @@ function ProductDetail() {
   const [averageRating, setAverageRating] = useState(0);
 
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
+
+  useEffect(() => {
+    setAiLoading(false);
+  }, [id]);
 
   // 🔥 1) Son bakılan ürün tablosuna kayıt
   useEffect(() => {
@@ -98,6 +108,104 @@ function ProductDetail() {
   useEffect(() => {
     if (id) fetchReviews();
   }, [id]);
+
+  // Gemini özet arka planda yazılınca yakala (mobil ile aynı mantık)
+  useEffect(() => {
+    if (!id) return;
+
+    const hasReviews = reviews.length > 0;
+    const aiText = product?.aiSummary;
+    const aiAvailable = !!(aiText && String(aiText).trim().length > 0);
+
+    if (!hasReviews || aiAvailable) return;
+
+    let cancelled = false;
+    setAiLoading(true);
+
+    const fetchFreshProduct = async () => {
+      const res = await axios.get(`${API_URL}/Product/${id}`, {
+        params: { _t: Date.now() },
+        headers: {
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      });
+      return res.data;
+    };
+
+    (async () => {
+      try {
+        const maxAttempts = 120;
+        for (let attempt = 0; !cancelled && attempt < maxAttempts; attempt++) {
+          if (attempt > 0) await new Promise((r) => setTimeout(r, 2000));
+          try {
+            const next = await fetchFreshProduct();
+            if (cancelled) break;
+            const text = pickAiSummary(next);
+            if (text.length > 0) {
+              setProduct((prev) => {
+                if (!prev) return next;
+                return {
+                  ...prev,
+                  aiSummary: text,
+                  aiSummaryUpdatedAt:
+                    next.aiSummaryUpdatedAt ?? next.AiSummaryUpdatedAt ?? null,
+                };
+              });
+              return;
+            }
+          } catch {
+            /* yeniden dene */
+          }
+        }
+      } finally {
+        if (!cancelled) setAiLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      setAiLoading(false);
+    };
+  }, [id, reviews.length, product?.aiSummary]);
+
+  // Sekmeye dönünce tek istek (özet oluşmuş olabilir)
+  useEffect(() => {
+    if (!id || reviews.length === 0) return;
+    const hasAi =
+      product?.aiSummary && String(product.aiSummary).trim().length > 0;
+    if (hasAi) return;
+
+    const onVisible = () => {
+      if (document.visibilityState !== "visible") return;
+      axios
+        .get(`${API_URL}/Product/${id}`, {
+          params: { _t: Date.now() },
+          headers: { "Cache-Control": "no-cache", Pragma: "no-cache" },
+        })
+        .then((res) => {
+          const text = pickAiSummary(res.data);
+          if (text.length > 0) {
+            setProduct((prev) => {
+              if (!prev) return res.data;
+              return {
+                ...prev,
+                aiSummary: text,
+                aiSummaryUpdatedAt:
+                  res.data.aiSummaryUpdatedAt ??
+                  res.data.AiSummaryUpdatedAt ??
+                  null,
+              };
+            });
+            setAiLoading(false);
+          }
+        })
+        .catch(() => {});
+    };
+
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [id, reviews.length, product?.aiSummary]);
 
   // 🔹 4) Beden / numara seçeneklerini getir
   useEffect(() => {
@@ -232,9 +340,7 @@ function ProductDetail() {
             src={
               !product.imageUrl
                 ? "https://via.placeholder.com/150"
-                : product.imageUrl.startsWith("http")
-                ? product.imageUrl
-                : `https://localhost:7258/${product.imageUrl}`
+                : assetUrl(product.imageUrl)
             }
             alt={product.name}
             className={`detail-image ${
@@ -359,11 +465,7 @@ function ProductDetail() {
               >
                 <div className="related-img-wrapper">
                   <img
-                    src={
-                      rp.imageUrl?.startsWith("http")
-                        ? rp.imageUrl
-                        : `https://localhost:7258/${rp.imageUrl}`
-                    }
+                    src={assetUrl(rp.imageUrl)}
                     alt={rp.name}
                     loading="lazy"
                   />
@@ -377,6 +479,31 @@ function ProductDetail() {
           </div>
         </div>
       )}
+
+      {/* Yapay zeka yorum özeti — yorumların hemen üstü */}
+      {reviews.length > 0 &&
+        (aiLoading ||
+          (product.aiSummary &&
+            String(product.aiSummary).trim().length > 0)) && (
+          <div className="ai-summary-card" aria-live="polite">
+            <div className="ai-summary-inner">
+              <div className="ai-summary-header">
+                <span className="ai-summary-icon" aria-hidden>
+                  ✨
+                </span>
+                <h3 className="ai-summary-title">Yapay Zeka Analizi</h3>
+              </div>
+              {aiLoading ? (
+                <div className="ai-summary-loading">
+                  <span className="ai-summary-spinner" aria-hidden />
+                  <p>Yapay zeka yorumları analiz ediyor...</p>
+                </div>
+              ) : (
+                <p className="ai-summary-text">{product.aiSummary}</p>
+              )}
+            </div>
+          </div>
+        )}
 
       {/* 🔹 ALTTA YORUM BÖLÜMÜ */}
       <div className="reviews-section">

@@ -1,13 +1,14 @@
 import axios from "axios";
+import { API_URL } from "../config/api.js";
 
-const API_URL = "https://localhost:7258/api/User"; // kendi ASP.NET portuna göre düzenle
+const USER_API_URL = `${API_URL}/User`;
 
 export const getUsers = async () => {
-  const response = await axios.get(API_URL);
+  const response = await axios.get(USER_API_URL);
   return response.data;
 };
 
 export const addUser = async (user) => {
-  const response = await axios.post(API_URL, user);
+  const response = await axios.post(USER_API_URL, user);
   return response.data;
 };

@@ -4,7 +4,7 @@ import "./AdminPanel.css";
 import Pagination from "./Pagination";
 import useHybridPagination from "../hooks/useHybridPagination";
 
-const API_URL = "https://localhost:7258/api";
+import { API_URL, assetUrl } from "../config/api.js";
 
 function AdminPanel() {
   const [pendingProducts, setPendingProducts] = useState([]);
@@ -153,11 +153,7 @@ function AdminPanel() {
       status: product.status,
     });
 
-    setPreviewUrl(
-      product.imageUrl?.startsWith("http")
-        ? product.imageUrl
-        : `https://localhost:7258/${product.imageUrl}`
-    );
+    setPreviewUrl(assetUrl(product.imageUrl));
 
     const subs = subCategories.filter(
       (sc) => sc.categoryId === product.categoryId
@@ -332,15 +328,7 @@ function AdminPanel() {
                 <td>{p.categoryName}</td>
                 <td>
                   {p.imageUrl && (
-                    <img
-                      src={
-                        p.imageUrl.startsWith("http")
-                          ? p.imageUrl
-                          : `https://localhost:7258/${p.imageUrl}`
-                      }
-                      width="60"
-                      height="60"
-                    />
+                    <img src={assetUrl(p.imageUrl)} width="60" height="60" />
                   )}
                 </td>
                 <td>
@@ -472,15 +460,7 @@ function AdminPanel() {
                   <td>{p.subCategoryName || "-"}</td>
                   <td>
                     {p.imageUrl && (
-                      <img
-                        src={
-                          p.imageUrl.startsWith("http")
-                            ? p.imageUrl
-                            : `https://localhost:7258/${p.imageUrl}`
-                        }
-                        width="60"
-                        height="60"
-                      />
+                      <img src={assetUrl(p.imageUrl)} width="60" height="60" />
                     )}
                   </td>
                   <td>

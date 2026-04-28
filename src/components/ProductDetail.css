@@ -552,6 +552,70 @@
   padding: 10px 0;
 }
 
+/* Yapay zeka yorum özeti */
+.ai-summary-card {
+  margin: 48px auto 0;
+  max-width: 920px;
+  border-radius: 16px;
+  border: 1px solid #ffe8d6;
+  background: linear-gradient(135deg, #fff8f3 0%, #ffffff 50%, #fff5ec 100%);
+  box-shadow: 0 4px 20px rgba(255, 123, 0, 0.08);
+  overflow: hidden;
+}
+
+.ai-summary-inner {
+  padding: 22px 26px;
+  position: relative;
+}
+
+.ai-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.ai-summary-icon {
+  font-size: 1.1rem;
+}
+
+.ai-summary-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.ai-summary-loading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.ai-summary-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid #ffe0cc;
+  border-top-color: #ff7b00;
+  border-radius: 50%;
+  animation: ai-spin 0.75s linear infinite;
+}
+
+@keyframes ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ai-summary-text {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #444;
+}
+
 /* 🔹 Yorumlar bölümü */
 .reviews-section {
   margin-top: 40px;

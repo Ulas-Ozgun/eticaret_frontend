@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./OrdersPage.css";
 
-const API_URL = "https://localhost:7258/api";
+import { API_URL, assetUrl } from "../config/api.js";
 
 function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -42,9 +42,7 @@ function OrdersPage() {
                 src={
                   !order.product.imageUrl
                     ? "https://via.placeholder.com/120"
-                    : order.product.imageUrl.startsWith("http")
-                    ? order.product.imageUrl
-                    : `https://localhost:7258/${order.product.imageUrl}`
+                    : assetUrl(order.product.imageUrl)
                 }
                 alt={order.product.name}
                 className="order-image"

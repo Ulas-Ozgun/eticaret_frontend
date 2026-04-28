@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./HomeSlider.css";
-
-const API_URL = "https://localhost:7258/api";
+import { API_URL, assetUrl } from "../config/api.js";
 
 function HomeSlider() {
   const [images, setImages] = useState([]);
@@ -10,7 +9,7 @@ function HomeSlider() {
 
   useEffect(() => {
     const loadImages = async () => {
-      const res = await axios.get(`${API_URL}/product/slider`);
+      const res = await axios.get(`${API_URL}/Product/slider`);
       setImages(res.data);
     };
 
@@ -46,7 +45,7 @@ function HomeSlider() {
           <div
             className="slider-bg"
             style={{
-              backgroundImage: `url(https://localhost:7258/${images[index]})`,
+              backgroundImage: `url(${assetUrl(images[index])})`,
             }}
           ></div>
 

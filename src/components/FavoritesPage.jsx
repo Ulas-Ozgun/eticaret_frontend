@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import "./FavoritesPage.css";
 
-const API_URL = "https://localhost:7258/api";
+import { API_URL, assetUrl } from "../config/api.js";
 
 function FavoritesPage() {
   const [favorites, setFavorites] = useState([]);
@@ -44,11 +44,7 @@ function FavoritesPage() {
           {favorites.map((fav) => (
             <div key={fav.id} className="favorite-card">
               <img
-                src={
-                  fav.product.imageUrl?.startsWith("http")
-                    ? fav.product.imageUrl
-                    : `https://localhost:7258/${fav.product.imageUrl}`
-                }
+                src={assetUrl(fav.product.imageUrl)}
                 alt={fav.product.name}
                 className="favorite-image"
               />

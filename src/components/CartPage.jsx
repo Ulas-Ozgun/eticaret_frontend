@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_URL, assetUrl } from "../config/api.js";
 import "./CartPage.css";
 
 function CartPage() {
@@ -18,7 +19,7 @@ function CartPage() {
   const loadCart = async () => {
     try {
       const response = await axios.get(
-        `https://localhost:7258/api/cart/get/${userId}`
+        `${API_URL}/Cart/get/${userId}`
       );
       setCartItems(response.data.cartItems || []);
       calculateTotal(response.data.cartItems || []);
@@ -39,7 +40,7 @@ function CartPage() {
   // 🔹 Ürün sil
   const removeItem = async (itemId) => {
     try {
-      await axios.delete(`https://localhost:7258/api/Cart/${itemId}`);
+      await axios.delete(`${API_URL}/Cart/${itemId}`);
       const updatedItems = cartItems.filter((i) => i.id !== itemId);
       setCartItems(updatedItems);
       calculateTotal(updatedItems);
@@ -56,7 +57,7 @@ function CartPage() {
     if (!item) return;
 
     try {
-      await axios.put(`https://localhost:7258/api/Cart/${itemId}`, {
+      await axios.put(`${API_URL}/Cart/${itemId}`, {
         userId: userId,
         productId: item.product.id,
         quantity: newQuantity,
@@ -76,7 +77,7 @@ function CartPage() {
   const handleCheckout = async () => {
     try {
       const response = await axios.post(
-        `https://localhost:7258/api/Cart/purchase/${userId}`
+        `${API_URL}/Cart/purchase/${userId}`
       );
 
       // Başarılıysa popup göster
@@ -122,9 +123,7 @@ function CartPage() {
                   src={
                     !item.product.imageUrl
                       ? "https://via.placeholder.com/120"
-                      : item.product.imageUrl.startsWith("http")
-                      ? item.product.imageUrl
-                      : `https://localhost:7258/${item.product.imageUrl}`
+                      : assetUrl(item.product.imageUrl)
                   }
                   alt={item.product.name}
                   className="cart-image"
